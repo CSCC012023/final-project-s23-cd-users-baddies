@@ -5,3 +5,4 @@
 | Harshil Patel | pate1096 | 1006282087 | harshill.patel@mail.utoronto.ca | Discord: Clutch#3089 | Harshil Patel   |
 | Majed Abed Moosa | abedmoos | 1006243673 | majed.abedmoosa@mail.utoronto.ca | Discord: bisco#9883 | Majed Abed Moosa |
 | Amjad Hassoun | hassou15 | 1005949155 | amjad.hassoun@mail.utoronto.ca | Discord      | Boombarazzz#8476 |
+| Anas Nawed Khan | khanan25 | 1006430426 | anas.khan@mail.utoronto.ca | Discord: !!#2482 | Anas Khan |
