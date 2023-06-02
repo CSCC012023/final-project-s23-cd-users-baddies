@@ -29,9 +29,7 @@ To conclude, our product delivers a more streamlined and efficient solution for 
 
 #### Q4: What does "DONE" means to your Team 
 
-We can decide when a implementation or feature is done by passing it by the group. Testing functionalities is the most important part of a group project, so being able to implement a feature, and having others review it is a must. This removes any bias and allows for more rich and diverse ideas and edge cases to come to fruition. When the group can firmly say this feature fits its description, accomplishes all necessary steps and outputs correctly consistently
-, we can agree it's done
-----
+We can decide when a implementation or feature is done by passing it by the group. Testing functionalities is the most important part of a group  project, so being able to implement a feature, and having others review it is a must. This removes any bias and allows for more rich and diverse ideas and edge cases to come to fruition. When the group can firmly say this feature fits its description, accomplishes all necessary steps and outputs correctly consistently, we can agree it's done
 
 
 
