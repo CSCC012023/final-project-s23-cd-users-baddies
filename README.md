@@ -21,7 +21,7 @@ Before proceeding with installation, please ensure your device has the **followi
 * **[<u>Flutter SDK (LTS)](https://docs.flutter.dev/get-started/install)**
 * **<u>[Dart SDK (LTS)](https://dart.dev/get-dart)**
 * A text editor such as **[VSCode](https://code.visualstudio.com/Download)** or an IDE compatible with Flutter (e.g. Android Studio or XCode)
-* XCode CLI (for the iOS simulator)
+* Chrome
 
 ### Installation Steps: 
 1. Clone the repository to your local machine by pasting the following command in your terminal:
@@ -35,20 +35,18 @@ git clone git@github.com:CSCC012023/final-project-s23-cd-users-baddies.git
 
 2.  Navigate to the project directory using the following command:
 ```bash
-cd final-project-s23-cd-users-baddies
+cd final-project-s23-cd-users-baddies/bizreach
 ```
 
-3. Install the project dependencies with the following command:
+3. If you have VSCode and Flutter installed, you should see a "No device" or "Chrome (web-javascript)" on the bottom right of vscode
+
+4. Execute the following script to run the project:
 ```bash
-flutter pub get
+sh setup.sh
 ```
 
-4. Ensure you have an iOS or Android simulator running and connected to the IDE/Text Editor
-
-4. Execute the following command to run the project:
-```bash
-flutter run
-```
+5. Select "Chrome (web-javascript)" when prompted to pick a device. (Selection for device on the bottom right for VSCode users).
+  
 
 There you go! You now have BizReach running on your local machine. Good Coding!
 
