@@ -1,0 +1,23 @@
+body{
+    border-width: 5%;
+}
+.bodyy {
+    position: fixed;
+    top: 10%;
+    left: 18%;
+    display: flex;
+    flex-direction: column;
+    width: 100vh;
+    height: auto;
+}
+.title {
+    display: flex;
+    align-self: center;
+    
+}
+
+.map {
+    position: relative ;
+    left: 10%;
+    top: 10%;
+}

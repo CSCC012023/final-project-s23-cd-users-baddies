@@ -1,3 +1,13 @@
+import GoogleMap from "./GoogleMap";
+import "./Discover.css"
+
 export default function Discover() {
-    return <h1>Discover</h1>
+    return (
+        <div className="bodyy">
+            <h1 className="title">Discover</h1>
+            <div className="map">'
+                <GoogleMap/>
+            </div>
+        </div>
+    )
 }
