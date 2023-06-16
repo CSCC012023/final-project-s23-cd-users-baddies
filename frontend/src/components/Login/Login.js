@@ -35,19 +35,20 @@ const Login = () => {
   const [user, setUser] = useState(null);
   const [userType, setUserType] = useState(null);
   const [newUser, setNewUser] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [postalCode, setPostalCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(""); // Added phoneNumber state
+  const [postalCode, setPostalCode] = useState(""); // Added postalCode state
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const docRef = doc(db, 'Users', user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const userData = docSnap.data();
-          setUserType(userData.userType)
+          setUserType(userData.userType);
           setUser(userData);
+          setNewUser(false);
         } else {
           setUser(user);
           setNewUser(true);
@@ -74,7 +75,7 @@ const Login = () => {
   }
 
   const handleUserType = async (type) => {
-    var userData = {}
+    var userData = {};
     if (type === "customer") {
       userData = {
         uid: auth.currentUser.uid,
@@ -106,38 +107,38 @@ const Login = () => {
   if (user && !newUser) {
     return (
       <UserContext.Provider value={user}>
-        <Dashboard user = { user } userType = { userType } />
+        <Dashboard user={user} userType={userType} />
       </UserContext.Provider>
+    );
+  } else if (user && newUser) {
+    console.log(user);
+    
+    return (
+      <div className="user-type">
+        <p>Please provide your phone number and postal code:</p>
+        <input
+          type="text"
+          placeholder="Phone Number"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Postal Code"
+          value={postalCode}
+          onChange={(e) => setPostalCode(e.target.value)}
+        />
+        <p>Please select your user type:</p>
+        <button onClick={() => handleUserType('business')}>I'm a business</button>
+        <button onClick={() => handleUserType('customer')}>I'm a customer</button>
+      </div>
     );
   }
 
   return (
     <div className="login-buttons">
-      {newUser ? (
-        <div className="user-type">
-          <p>Please provide your phone number and postal code:</p>
-          <input
-            type="text"
-            placeholder="Phone Number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Postal Code"
-            value={postalCode}
-            onChange={(e) => setPostalCode(e.target.value)}
-          />
-          <p>Please select your user type:</p>
-          <button onClick={() => handleUserType('business')}>I'm a business</button>
-          <button onClick={() => handleUserType('customer')}>I'm a customer</button>
-        </div>
-      ) : (
-        <>
-          <button onClick={signInWithGoogle}>Sign in with Google</button>
-          <button onClick={signInWithApple}>Sign in with Apple</button>
-        </>
-      )}
+      <button onClick={signInWithGoogle}>Sign in with Google</button>
+      <button onClick={signInWithApple}>Sign in with Apple</button>
     </div>
   );
 }
