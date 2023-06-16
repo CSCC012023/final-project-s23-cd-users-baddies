@@ -1,4 +1,4 @@
-// import "./Home.css";
+import "./Home.css";
 
 import logo from "./assets/img/bizreach-logo.png";
 
