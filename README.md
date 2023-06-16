@@ -6,20 +6,19 @@ BizReach is an online platform used to connect nearby mobile businesses to custo
 
 The primary motivation of BizReach is to help customers easily find reliable businesses who are in need of their service without doing hours of research. We also strive to help talented small business owners gain a clientele without spending hundreds or thousands of dollars on advertising. 
 
-BizReach is primarily built off of Flutter. Flutter has been chosen as the framework to construct this app because of its potential to create high-quality cross-platform mobile applications with a single codebase, regardless of the OS of the device. Flutter is also relatively easy to learn for developers with experience with object-oriented programming languages like Python, Java, etc with Dart having similar syntax to Java and JS. 
+BizReach is built using React, Firebase, Node.js and Express. FERN has been chosen as the framework to construct this app because of its potential to create high-quality web applications with a single codebase, regardless of the OS of the device. This stack is also relatively easy to learn for developers with experience with object-oriented programming languages like Python, Java, etc and provides. Firebase also provides an authentication service which will be integrated in the platform 
 
   
 
 ## Installation
 
-BizReach is designed with the latest tools and frameworks which will make developing and contributing to the cross-platform mobile application easy.
+BizReach is designed with the latest tools and frameworks which will make developing and contributing to the web application easy.
 This section will guide you to setup BizReach on your local device. Please follow the steps provided below to get started.
 
 ### Prerequisites
 Before proceeding with installation, please ensure your device has the **following software and tools** installed:
 
-* **[<u>Flutter SDK (LTS)](https://docs.flutter.dev/get-started/install)**
-* **<u>[Dart SDK (LTS)](https://dart.dev/get-dart)**
+* **[<u>Node.js](https://nodejs.org/en/download)**
 * A text editor such as **[VSCode](https://code.visualstudio.com/Download)** or an IDE compatible with Flutter (e.g. Android Studio or XCode)
 * Chrome
 
@@ -35,18 +34,18 @@ git clone git@github.com:CSCC012023/final-project-s23-cd-users-baddies.git
 
 2.  Navigate to the project directory using the following command:
 ```bash
-cd final-project-s23-cd-users-baddies/bizreach
+cd final-project-s23-cd-users-baddies
 ```
 
-3. If you have VSCode and Flutter installed, you should see a "No device" or "Chrome (web-javascript)" on the bottom right of vscode
-
-4. Execute the following script to run the project:
+3. Execute the following command from the root directory to install the dependencies:
 ```bash
-sh setup.sh
+npm run install
 ```
 
-5. Select "Chrome (web-javascript)" when prompted to pick a device. (Selection for device on the bottom right for VSCode users).
-  
+4. Execute the following command from the root directory to run the project:
+```bash
+npm run start
+```
 
 There you go! You now have BizReach running on your local machine. Good Coding!
 
