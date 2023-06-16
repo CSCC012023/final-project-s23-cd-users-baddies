@@ -14,7 +14,7 @@ import {
   getDoc,
   setDoc
 } from "firebase/firestore";
-import Dashboard from '../Dashboard/Dashboard';
+import Dashboard from '../Routing/Routing';
 
 const firebaseConfig = {
   apiKey: "AIzaSyB-vRFrtFhIbXw2NHMj8VfBvi2iMU4kxwE",
