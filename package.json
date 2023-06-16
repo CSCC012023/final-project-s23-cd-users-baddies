@@ -1,0 +1,15 @@
+{
+  "name": "final-project-s23-cd-users-baddies",
+  "version": "1.0.0",
+  "description": "BizReach is an online platform used to connect nearby mobile businesses to customers in need of their services. It allows users to browse a variety of different services and businesses to view local customers in need of their services. Payments can be made directly on BizReach, which offers a simple and secure transaction.",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm start\" "
+  },
+  "author": "",
+  "license": "ISC"
+}
