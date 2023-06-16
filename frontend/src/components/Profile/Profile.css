@@ -1,0 +1,62 @@
+.profile-container {
+    text-align: center;
+    margin-bottom: 300px; /* Increase the margin-top value to move it up */
+    margin-right: 1000px;
+  }
+  
+  .profile-picture {
+    width: 200px;
+    height: auto;
+    border-radius: 50%;
+    margin-top: 20px;
+  }
+  .edit-profile-button {
+    background-color: #f1f1f1;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+  
+  .edit-profile-button.pressed {
+    transform: scale(0.95);
+  }
+  
+  .profile-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .right{
+    margin-left: 1750px;
+    margin-top: -350px;
+    align-items: center;
+  }
+  .profile-label {
+    font-weight: bold;
+    /* margin-right: 170px; */
+    margin-bottom: 20px; 
+
+  }
+  
+  .profile-value {
+    background-color: dimgray;
+    margin-bottom: 25px ;
+    /* margin-top: 30px;
+    margin-left: 50px; */
+    width: 350px;
+    border-radius: 10%;
+
+  }
+  .change-password-btn {
+    background-color: #f3f3f3;
+    color: #000000;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
