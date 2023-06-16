@@ -44,5 +44,10 @@ The tasks we need to complete to meet our goals:
 
 ### Artifacts
 
-To produce our project idea, we are building a static website, pushing it to our GitHub repo so we can utilize our platform anytime and anywhere. We also have developed low-fidelity prototypes of our project idea so, our frontend designers are on the same page.
+To produce our project idea, we are building a static website, pushing it to our GitHub repo so we can utilize our platform anytime and anywhere. Artifacts that we produced to ensure the platform is created are:
+- Wireframes and Mockups: Low-fidelity representations of the website's layout, structure, and user interface.
+- Design Attributes: Design assets such as logos, colour schemes, and other visual elements used to create a consistent and appealing design.
+- Front-End Code: JavaScript and CSS code that implements the website's user interface and behavior. 
+- Back-End Code: Javascript code that implements server-side functionality and data storage/retrieval.
+- Flow Diagrams: To ensure backend logic flows smoothly with the frontend design.
 
