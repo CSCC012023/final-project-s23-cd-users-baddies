@@ -4,7 +4,6 @@ import Profile from "../Profile/Profile";
 import Post from "../Post/Post"
 import Discover from "../Discover/Discover";
 import Home from "../Home/Home";
-import Post from "../Post/Post";
 
 export default function Routing() {
     return (
