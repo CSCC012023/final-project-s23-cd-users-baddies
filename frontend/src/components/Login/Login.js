@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './Login.css';
+import { UserContext } from '../User/UserContext';
 import {
   getAuth,
   signInWithPopup,
@@ -12,7 +13,7 @@ import {
   getFirestore,
   doc,
   getDoc,
-  setDoc
+  setDoc,
 } from "firebase/firestore";
 import Dashboard from '../Routing/Routing';
 
@@ -103,7 +104,11 @@ const Login = () => {
   }
 
   if (user && !newUser) {
-    return <Dashboard user = { user } userType = { userType } />;
+    return (
+      <UserContext.Provider value={user}>
+        <Dashboard user = { user } userType = { userType } />
+      </UserContext.Provider>
+    );
   }
 
   return (

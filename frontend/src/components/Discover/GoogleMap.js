@@ -1,92 +1,142 @@
 import React, { Component } from 'react';
-import {Map, InfoWindow, Marker, GoogleApiWrapper} from 'google-maps-react';
+import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
+import { initializeApp } from "firebase/app";
+import { UserContext } from '../User/UserContext';
+import {
+  getAuth,
+  onAuthStateChanged,
+} from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,  getDocs, collection
+} from "firebase/firestore";
 
 const style = {
-     width: '75%',
-     height: '60%',
-     overflowX: 'hidden'
- } 
- const containerStyle = {
-   width: '70vw',
-   height: '100vh',
-   overflowX: 'hidden'
- } 
+  width: '75%',
+  height: '60%',
+  overflowX: 'hidden'
+}
+const containerStyle = {
+  width: '70vw',
+  height: '100vh',
+  overflowX: 'hidden'
+}
+const firebaseConfig = {
+  apiKey: "CHANGE_WITH_PEROSNAL",
+  authDomain: "cd-user-baddies.firebaseapp.com",
+  projectId: "cd-user-baddies",
+  storageBucket: "cd-user-baddies.appspot.com",
+  messagingSenderId: "CHANGE_WITH_PEROSNAL",
+  appId: "1:CHANGE_WITH_PEROSNAL:web:5c6ee1f310aec572c34df5",
+  measurementId: "G-4026EEFZZ3"
+};
 
- export class MapContainer extends Component {
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-     state = {
-         showingInfoWindow: false,
-         activeMarker: {},
-         selectedPlace: {},
-       };
+const getPostsFromCustomers = async () => {
+  const querySnapshot = await getDocs(collection(db, 'Users'));
+  const posts = [];
 
-       onMarkerClick = (props, marker, e) =>
-         this.setState({
-           selectedPlace: props,
-           activeMarker: marker,
-           showingInfoWindow: true
-         });
+  querySnapshot.forEach((doc) => {
+    const userData = doc.data();
+    if (userData.userType === 'customer' && userData.Posts) {
+      userData.Posts.forEach((post) => {
+        posts.push(post);
+      });
+    }
+  });
 
-       onMapClicked = (props) => {
-         if (this.state.showingInfoWindow) {
-           this.setState({
-             showingInfoWindow: false,
-             activeMarker: null
-           })
-         }
-     };  
+  return posts;
+};
 
-   render() {
-     return (
-       <div >
-         <Map 
-           containerStyle={containerStyle}
-           resetBoundsOnResize={true}
-           style={style} 
-           google={this.props.google} 
-           onClick={this.onMapClicked}
-           zoom={10}
-           initialCenter={{
-               lat: 43.653225,
-               lng: -79.383186
-           }}
-         >
+export class MapContainer extends Component {
+  _isMounted = false;
+  
+  static contextType = UserContext;
 
-           <Marker
-               onClick={this.onMarkerClick}
-               title={'Julian'}
-               name={'Julian'}
-               position={{lat: 43.613225, lng: -79.53186}} />
-           <Marker
-               title={'Kim'}
-               name={'Kim'}
-               onClick={this.onMarkerClick}
-               position={{lat: 43.653225, lng: -79.7686}} />
-           <Marker 
-               title={'Lisa'}
-               name={'Lisa'}
-               onClick={this.onMarkerClick}
-               position={{lat: 43.653225, lng: -79.6686}} />
-           <Marker
-               title={'Mark'}
-               name={'Mark'}
-               onClick={this.onMarkerClick}
-               position={{lat: 43.653225, lng: -79.3186}}
-           />
-           <InfoWindow
-             marker={this.state.activeMarker}
-             visible={this.state.showingInfoWindow}>
-               <div>
-                 <h2>{this.state.selectedPlace.name}</h2>
-               </div>
-           </InfoWindow>
+  state = {
+    showingInfoWindow: false,
+    activeMarker: {},
+    selectedPost: null,
+    posts: []
+  };
 
-         </Map>
-       </div>
-     );
-   }
- }
+  async componentDidMount() {
+    this._isMounted = true;
+    const posts = await getPostsFromCustomers();
+    console.log(posts);
+    this.setState({ posts: posts });
+  }
 
- export default GoogleApiWrapper({
-   apiKey: ('AIzaSyBs6xBwT6DsTRosb8t2IGRAwmvwAp3fA8c')
- })(MapContainer) 
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  onMarkerClick = (props, marker, e) => {
+    if (this._isMounted) {
+      this.setState({
+        selectedPost: props.post,
+        activeMarker: marker,
+        showingInfoWindow: true
+      });
+    }
+  }
+
+  onMapClicked = () => {
+    if (this.state.showingInfoWindow) {
+      this.setState({
+        showingInfoWindow: false,
+        activeMarker: null
+      })
+    }
+  };
+
+  handleButtonClick = () => {
+    console.log(this.state.selectedPost);
+  }
+
+  render() {
+    const user = this.context;
+    return (
+      <div>
+        <Map
+          containerStyle={containerStyle}
+          resetBoundsOnResize={true}
+          style={style}
+          google={this.props.google}
+          onClick={this.onMapClicked}
+          zoom={10}
+          initialCenter={{
+            lat: 43.653225,
+            lng: -79.383186
+          }}
+        >
+          {this.state.posts.map((post, index) => (
+            <Marker
+              key={index}
+              onClick={this.onMarkerClick}
+              name={post.title}
+              post={post}
+              position={{ lat: post.location.lat, lng: post.location.lon }} />
+          ))}
+          <InfoWindow
+            marker={this.state.activeMarker}
+            visible={this.state.showingInfoWindow}>
+            <div style={{ color: 'black' }}>
+              <h2>{this.state.selectedPost?.title}</h2>
+              <p>Price: {this.state.selectedPost?.price}</p>
+            </div>
+          </InfoWindow>
+        </Map>
+      </div>
+    );
+  }
+}
+
+export default GoogleApiWrapper({
+  apiKey: ('CHANGE_WITH_PEROSNAL')
+})(MapContainer)
