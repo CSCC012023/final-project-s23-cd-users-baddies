@@ -4,11 +4,12 @@ import "./Navbar.css"
 export default function Navbar() {
     return (
         <nav className="nav">
-            <Link to="/" className="site-title"> 
-                BizReach
-            </Link>
             <ul>
                 <CustomLink to="/profile">Profile</CustomLink>
+                <CustomLink to="/message">Message</CustomLink>
+                <Link to="/" className="site-title"> 
+                    BizReach
+                </Link>
                 <CustomLink to="/post">Post</CustomLink>  
                 <CustomLink to="/discover">Discover</CustomLink> 
             </ul>
