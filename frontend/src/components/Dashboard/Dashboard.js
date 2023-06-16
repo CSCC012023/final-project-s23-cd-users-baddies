@@ -33,7 +33,7 @@ const Dashboard = ({
                     user.Name
                         } < /p>
                         <
-        p > Your numner is {
+        p > Your number is {
             user.contactNumber
                 } < /p>
                 <
