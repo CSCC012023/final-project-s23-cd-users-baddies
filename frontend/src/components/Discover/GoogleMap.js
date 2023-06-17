@@ -12,6 +12,14 @@ import {
   getDoc,
   setDoc,  getDocs, collection
 } from "firebase/firestore";
+import {
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
+
+
+
 
 const style = {
   width: '75%',
@@ -58,22 +66,46 @@ export class MapContainer extends Component {
   
   static contextType = UserContext;
 
-  state = {
-    showingInfoWindow: false,
-    activeMarker: {},
-    selectedPost: null,
-    posts: []
-  };
+  constructor(props) {
+    super(props);
+    this._isMounted = false;
+    this.state = {
+      showingInfoWindow: false,
+      activeMarker: {},
+      selectedPost: null,
+      posts: []
+    };
+  }
 
   async componentDidMount() {
     this._isMounted = true;
     const posts = await getPostsFromCustomers();
-    console.log(posts);
     this.setState({ posts: posts });
+    document.addEventListener('click', this.logPost);
+
   }
 
+  async handlePostTransfer(post) {
+    // Find the original poster
+    const originalPosterRef = doc(db, 'Users', post.postedBy);  // assuming 'postedBy' field in each post contains the id of the original poster
+    // Remove the post from the original poster's 'Posts' array
+    await updateDoc(originalPosterRef, {
+      Posts: arrayRemove(post)
+    });
+  
+    // Get the current user
+    const currentUserRef = doc(db, 'Users', this.context.uid);  // assuming 'uid' field in the context contains the id of the current user
+    // Add the post to the current user's 'Gigs' array
+    await updateDoc(currentUserRef, {
+      Gigs: arrayUnion(post)
+    });
+  
+    console.log("Post transfer complete");
+  }
+  
   componentWillUnmount() {
     this._isMounted = false;
+    document.removeEventListener('click', this.logPost);
   }
 
   onMarkerClick = (props, marker, e) => {
@@ -97,6 +129,29 @@ export class MapContainer extends Component {
 
   handleButtonClick = () => {
     console.log(this.state.selectedPost);
+    this.handlePostTransfer(this.state.selectedPost);
+  }
+
+  logPost = (event) => {
+    // Check if the clicked element is the Log Post button
+    if (event.target && event.target.id === 'logPostButton') {
+      this.handleButtonClick(this.state.selectedPost);
+    }
+  }
+
+   infoWindowContent = () => {
+    const user = this.context;
+    const selectedPost = this.state.selectedPost;
+    return (
+      <div style={{ color: 'black' }}>
+        <h2>{selectedPost?.title}</h2>
+        <p>Price: {selectedPost?.price}</p>
+        {user.userType === 'business' &&
+          // Add an id to the button so we can identify it in the event listener
+          <button id='logPostButton'>Grab Gig</button>
+        }
+      </div>
+    );
   }
 
   render() {
@@ -121,19 +176,18 @@ export class MapContainer extends Component {
               onClick={this.onMarkerClick}
               name={post.title}
               post={post}
-              position={{ lat: post.location.lat, lng: post.location.lon }} />
+              position={{ lat: post.location.lat, lng: post.location.lon }} />  // Ensure the post has location property with lat and lng
           ))}
           <InfoWindow
             marker={this.state.activeMarker}
-            visible={this.state.showingInfoWindow}>
-            <div style={{ color: 'black' }}>
-              <h2>{this.state.selectedPost?.title}</h2>
-              <p>Price: {this.state.selectedPost?.price}</p>
-            </div>
+            visible={this.state.showingInfoWindow}
+          >
+            {this.infoWindowContent()}
           </InfoWindow>
         </Map>
       </div>
     );
+
   }
 }
 
