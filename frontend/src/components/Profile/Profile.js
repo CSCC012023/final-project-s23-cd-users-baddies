@@ -1,18 +1,11 @@
 import React, { useState, useContext } from 'react';
-import ProfilePicture from './Profile pic.jpeg'; // Import the profile picture
-import './Profile.css';
+import { Box, Button, Flex, Image, Input, Text } from '@chakra-ui/react';
 import { UserContext } from '../User/UserContext';
-import {
-  getAuth,
-  signOut,
-} from 'firebase/auth';
-import {
-  getFirestore,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { getAuth, signOut } from 'firebase/auth';
+import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+import ProfilePicture from './Profile pic.jpeg'; // Import the profile picture
 
-const Profile = ({ }) => {
+const Profile = () => {
   const user = useContext(UserContext);
   const [name, setName] = useState(user.Name);
   const [number, setNumber] = useState(user.contactNumber);
@@ -45,39 +38,43 @@ const Profile = ({ }) => {
   };
 
   return (
-    <div>
-      <div className="profile-container">
-        <h1>Welcome {user.Name}! </h1>
-        <div className='left'>
-          <div className="profile-content">
-            <img src={ProfilePicture} alt="Profile" className="profile-picture" />
-            <button
-              className={`edit-profile-button`}
-              onClick={handleSave}
-            >
-              Save
-            </button>
-          </div>
-          <button onClick={handleSignOut}> Sign out </button>
-        </div>
-
-        <div className='right'>
-          <div className="profile-item">
-            <div className="profile-label">Full Name</div>
-            <input type="text" className="profile-value" value={name} onChange={e => setName(e.target.value)} />
-          </div>
-          <div className="profile-item">
-            <div className="profile-label">Number</div>
-            <input type="text" className="profile-value" value={number} onChange={e => setNumber(e.target.value)} />
-          </div>
-          <div className="profile-item">
-            <div className="profile-label">Rating</div>
-            <div className="profile-value">{user.Rating}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
+    <Flex justify="center" direction="column" mt={10}>
+      <Text fontSize="4xl" fontWeight="bold" mb={4}>
+        Welcome {user.Name}!
+      </Text>
+      <Flex align="center" mb={8}>
+        <Flex direction="column" mr={6}>
+          <Image src={ProfilePicture} alt="Profile" borderRadius="full" boxSize="200px" />
+          <Button mt={4} colorScheme="blue" onClick={handleSave}>
+            Save
+          </Button>
+        </Flex>
+        <Box>
+          <Flex direction="column" mb={4}>
+            <Text fontWeight="bold" mb={2}>
+              Full Name
+            </Text>
+            <Input colorScheme="gray" type="text" value={name} onChange={(e) => setName(e.target.value)} />
+          </Flex>
+          <Flex direction="column" mb={4}>
+            <Text fontWeight="bold" mb={2}>
+              Number
+            </Text>
+            <Input color="white" colorScheme="white" type="text" value={number} onChange={(e) => setNumber(e.target.value)} />
+          </Flex>
+          <Flex direction="column">
+            <Text fontWeight="bold" mb={2}>
+              Rating
+            </Text>
+            <Text>{user.Rating}</Text>
+          </Flex>
+        </Box>
+      </Flex>
+      <Button colorScheme="red" onClick={handleSignOut}>
+        Sign out
+      </Button>
+    </Flex>
+  );
+};
 
 export default Profile;
