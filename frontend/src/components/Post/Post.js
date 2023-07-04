@@ -1,35 +1,10 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Post.css';
-import { initializeApp } from "firebase/app";
 import { UserContext } from '../User/UserContext';
-import {
-  getAuth,
-  onAuthStateChanged,
-} from "firebase/auth";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc
-} from "firebase/firestore";
 
 const Post = () => {
-  const firebaseConfig = {
-    apiKey: "AIzaSyB-vRFrtFhIbXw2NHMj8VfBvi2iMU4kxwE",
-    authDomain: "cd-user-baddies.firebaseapp.com",
-    projectId: "cd-user-baddies",
-    storageBucket: "cd-user-baddies.appspot.com",
-    messagingSenderId: "984565407792",
-    appId: "1:984565407792:web:5c6ee1f310aec572c34df5",
-    measurementId: "G-4026EEFZZ3"
-  };
-
   const user = useContext(UserContext);
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
@@ -40,43 +15,41 @@ const Post = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`);
-    const data = await response.json();
-    const coordinates = data[0] ? { lat: data[0].lat, lon: data[0].lon } : null;
+    try {
+      // Fetch coordinates from the location
+      const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
+      const geocodeResponse = await fetch(geocodeUrl);
+      const geocodeData = await geocodeResponse.json();
 
-    if (coordinates) {
-      const docRef = doc(db, 'Users', user.uid);
-      const docSnap = await getDoc(docRef);
-      const userData = docSnap.data();
+      if (geocodeData && geocodeData.length > 0) {
+        const { lat, lon } = geocodeData[0];
 
-      if (userData.userType !== 'customer') {
-        console.error('Only customers can post.');
-        return;
+        // Make a POST request to the backend API
+        const response = await fetch(`http://localhost:3000/api/posts/users/${user.uid}/posts`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title,
+            description,
+            price,
+            location: { lat, lon },
+            postalCode
+          })
+        });
+
+        if (response.ok) {
+          console.log('Post added successfully.');
+          navigate('/');
+        } else {
+          console.error('Error adding post:', response.statusText);
+        }
+      } else {
+        console.error('Could not geocode the location.');
       }
-
-      const postData = {
-        title,
-        description,
-        price,
-        location: coordinates,
-        postalCode,
-        postedBy: user.uid,
-      };
-
-      if (!userData.Posts) {
-        userData.Posts = [];
-      }
-      userData.Posts.push(postData);
-
-      try {
-        await setDoc(doc(db, 'Users', auth.currentUser.uid), userData);
-        console.log('Post added successfully.');
-        navigate('/');
-      } catch (error) {
-        console.error('Error adding post:', error);
-      }
-    } else {
-      console.error('Could not geocode the location.');
+    } catch (error) {
+      console.error('Error adding post:', error);
     }
   };
 
@@ -116,3 +89,4 @@ const Post = () => {
 };
 
 export default Post;
+
