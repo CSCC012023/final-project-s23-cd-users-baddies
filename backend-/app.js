@@ -9,7 +9,11 @@ app.use(cors());
 
 // Routes
 const postRoutes = require('./routes/posts');
+const usersRoutes = require('./routes/users');
+const authRoutes = require('./routes/auth');
 app.use('/api/posts', postRoutes);
+app.use('/api/users', usersRoutes);
+app.use('/api/auths', authRoutes);
 
 // Start the server
 const port = 3000;
