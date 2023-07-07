@@ -32,7 +32,6 @@ import {
   Select,
   Grid,
   GridItem,} from '@chakra-ui/react';
-import TimePicker from 'react-time-picker';
 
 const firebaseConfig = {
   apiKey: 'CHANGE_WITH_PEROSNAL',
