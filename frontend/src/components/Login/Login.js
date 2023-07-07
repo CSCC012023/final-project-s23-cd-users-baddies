@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState} from 'react';
 import './Login.css';
 import { UserContext } from '../User/UserContext';
 import {
@@ -15,7 +15,7 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import Dashboard from '../Routing/Routing';
+import Routing from '../Routing/Routing';
 import {
   Flex,
   Heading,
@@ -26,14 +26,13 @@ import {
   Image,
   Box,
   Link,
-  Center,
   FormControl,
   FormHelperText,
   InputRightElement,
   Text,
   Checkbox
 } from "@chakra-ui/react";
-
+import BusinessRegistriation from "./BusinessRegistration"
 const firebaseConfig = {
   apiKey: "AIzaSyB-vRFrtFhIbXw2NHMj8VfBvi2iMU4kxwE",
   authDomain: "cd-user-baddies.firebaseapp.com",
@@ -49,6 +48,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const Login = () => {
+
+  const [showBusinessForm, setShowBusinessForm] = useState(false);
   const [user, setUser] = useState(null);
   const [userType, setUserType] = useState(null);
   const [newUser, setNewUser] = useState(false);
@@ -86,11 +87,6 @@ const Login = () => {
     signInWithPopup(auth, provider);
   }
 
-  const signInWithApple = () => {
-    const provider = new OAuthProvider('apple.com');
-    signInWithPopup(auth, provider);
-  }
-
   const handleUserType = async (type) => {
     var userData = {};
     if (type === "customer") {
@@ -104,6 +100,7 @@ const Login = () => {
         Posts: [],
       };
     } else {
+      setShowBusinessForm(true);
       userData = {
         uid: auth.currentUser.uid,
         userType: type,
@@ -113,6 +110,10 @@ const Login = () => {
         Rating: 5,
         Gigs: [],
       };
+
+
+
+
     }
     await setDoc(doc(db, 'Users', auth.currentUser.uid), userData);
 
@@ -120,11 +121,12 @@ const Login = () => {
     setUser(userData);
     setNewUser(false);
   }
+  
 
   if (user && !newUser) {
     return (
       <UserContext.Provider value={user}>
-        <Dashboard user={user} userType={userType} />
+        <Routing user={user} userType={userType} />
       </UserContext.Provider>
     );
   } else if (user && newUser) {
@@ -169,12 +171,13 @@ const Login = () => {
 
 
               <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
-                  Password
+                  Phone Number
                 </Text>
                 <InputGroup>
                 
                   <Input
-                    placeholder="Password" mt='2%'
+                    placeholder="Phone Number" mt='2%'
+                    onChange={(e) => setPhoneNumber(e.target.value)}
                   />
                   <InputRightElement width="4.5rem">
                   </InputRightElement>
@@ -206,14 +209,21 @@ const Login = () => {
                 colorScheme="teal"
                 mt='5%'
                 onClick={() => handleUserType('customer')}
+                
   
               >
                 I am a Customer
               </Button>
 
-            </Stack>
 
-            
+              if(showBusinessForm) {
+            <Box>
+              <Text>Welcome, Business User!</Text>
+              <Text>Additional business-specific content...</Text>
+            </Box>
+          }
+
+            </Stack>
       </Stack>
     </Flex>
 
@@ -274,7 +284,7 @@ const Login = () => {
             >
               <FormControl>
                 <InputGroup>
-                  <Input type="email" placeholder="email address" />
+                  <Input type="email" placeholder="Email address" />
                 </InputGroup>
               </FormControl>
               <FormControl>
