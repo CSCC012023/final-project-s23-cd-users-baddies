@@ -3,28 +3,21 @@ import { Box, Button, Flex, Image, Input, Text, Select, FormControl, Grid, GridI
 import { UserContext } from '../User/UserContext';
 import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
-import ProfilePicture from './Profile pic.jpeg'; // Import the profile picture
+import ProfilePicture from './Profile pic.jpeg'; 
 
 const Profile = () => {
   const user = useContext(UserContext);
 
   const userType = user.userType;
   const isBusiness = userType === 'business';
-  const business = user.Business || {};
-
+  const business = isBusiness ? user.Business || {} : {};
+  const [businessHours, setBusinessHours] = useState(business.Hours);
   const [name, setName] = useState(user.Name);
   const [number, setNumber] = useState(user.contactNumber);
-  const [businessName, setBusinessName] = useState(business.Name || '');
-  const [businessDescription, setBusinessDescription] = useState(business.Description || '');
-  const [businessHours, setBusinessHours] = useState(user.Business.Hours || {
-    Monday: null,
-    Tuesday: null,
-    Wednesday: null,
-    Thursday: null,
-    Friday: null,
-    Saturday: null,
-    Sunday: null,
-  });
+  const [businessName, setBusinessName] = useState(isBusiness ? (business.Name || '') : '');
+  const [businessDescription, setBusinessDescription] = useState(isBusiness ? (business.Description || '') : '');
+  
+
   const auth = getAuth();
   const db = getFirestore();
 
@@ -57,17 +50,12 @@ const Profile = () => {
         Business: {
           Name: businessName,
           Description: businessDescription,
+          Hours: businessHours
         },
       };
     }
 
-    await updateDoc(userRef, {
-      ...userData,
-      Business: {
-        ...userData.Business,
-        Hours: businessHours,
-      },
-    });
+    await updateDoc(userRef, userData);
   };
 
   return (
@@ -93,7 +81,7 @@ const Profile = () => {
             <Text fontWeight="bold" mb={2}>
               Number
             </Text>
-            <Input color="white" colorScheme="white" type="text" value={number} onChange={(e) => setNumber(e.target.value)} />
+            <Input colorScheme="white" type="text" value={number} onChange={(e) => setNumber(e.target.value)} />
           </Flex>
           {isBusiness && (
             <>
@@ -109,46 +97,45 @@ const Profile = () => {
                 </Text>
                 <Input colorScheme="gray" type="text" value={businessDescription} onChange={(e) => setBusinessDescription(e.target.value)} />
               </Flex>
-              <Flex direction="column" mb={4}> <FormControl mt="3%">
-      <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-        Business Hours
-      </Text>
-      <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-        {Object.keys(businessHours).map((day) => (
-          <GridItem key={day}>
-            <Flex flexDirection="column">
-              <Text>{day}</Text>
-              <Flex flexDirection="row" justifyContent="space-between">
-                <Select placeholder="Start Hour" defaultValue={businessHours[day]? businessHours[day].startHour : ''} onChange={(e) => 
-                  setBusinessHours((prevHours) => ({
-                    ...prevHours,
-                    [day]: { ...prevHours[day], startHour: e.target.value },
-                  }))}>
-                  {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
+              <FormControl mt="3%">
+                <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
+                  Business Hours
+                </Text>
+                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                  {Object.keys(businessHours).map((day) => (
+                    <GridItem key={day}>
+                      <Flex flexDirection="column">
+                        <Text>{day}</Text>
+                        <Flex flexDirection="row" justifyContent="space-between">
+                          <Select placeholder="Start Hour" defaultValue={businessHours[day]? businessHours[day].startHour : ''} onChange={(e) => 
+                            setBusinessHours((prevHours) => ({
+                              ...prevHours,
+                              [day]: { ...prevHours[day], startHour: e.target.value },
+                            }))}>
+                            {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                              <option key={hour} value={hour}>
+                                {hour}:00
+                              </option>
+                            ))}
+                          </Select>
+                          <Select placeholder="End Hour" defaultValue={businessHours[day]? businessHours[day].endHour : ''} onChange={(e) =>
+                            setBusinessHours((prevHours) => ({
+                              ...prevHours,
+                              [day]: { ...prevHours[day], endHour: e.target.value },
+                            }))}>
+                            {Array.from({ length: 24 }, (_, i) => i+1).map((hour) => (
+                              <option key={hour} value={hour}>
+                                {hour}:00
+                              </option>
+                            ))}
+                          </Select>
+                        </Flex>
+                      </Flex>
+                    </GridItem>
                   ))}
-                </Select>
-                <Select placeholder="End Hour" defaultValue={businessHours[day]? businessHours[day].endHour : ''} onChange={(e) =>
-                  setBusinessHours((prevHours) => ({
-                    ...prevHours,
-                    [day]: { ...prevHours[day], endHour: e.target.value },
-                  }))}>
-                  {Array.from({ length: 24 }, (_, i) => i+1).map((hour) => (
-                    <option key={hour} value={hour}>
-                      {hour}:00
-                    </option>
-                  ))}
-                </Select>
-              </Flex>
-            </Flex>
-          </GridItem>
-        ))}
-      </Grid>
-    </FormControl> </Flex>
+                </Grid>
+              </FormControl>
             </>
-            
           )}
           <Flex direction="column">
             <Text fontWeight="bold" mb={2}>

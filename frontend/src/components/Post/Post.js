@@ -39,6 +39,7 @@ const Post = () => {
       const geocodeResponse = await fetch(geocodeUrl);
       const geocodeData = await geocodeResponse.json();
 
+
       if (geocodeData && geocodeData.length > 0) {
         const { lat, lon } = geocodeData[0];
 
@@ -53,10 +54,10 @@ const Post = () => {
             description,
             price,
             location: { lat, lon },
-            postalCode
+            postalCode,
           })
         });
-
+        
         if (response.ok) {
           console.log('Post added successfully.');
           navigate('/');
@@ -175,38 +176,6 @@ const Post = () => {
       </Stack>
     </Flex>
     </form>
-
-    // <div className="post-form-container">
-    //   {user.userType === 'customer' ? (
-    //     <form className="post-form" onSubmit={handleSubmit}>
-    //       <label>
-    //         Postal Code:
-    //         <input type="text" value={postalCode} onChange={e => setPostalCode(e.target.value)} />
-    //       </label>
-    //       <label>
-    //         Title:
-    //         <input type="text" value={title} onChange={e => setTitle(e.target.value)} />
-    //       </label>
-    //       <label>
-    //         Description:
-    //         <input type="text" value={description} onChange={e => setDescription(e.target.value)} />
-    //       </label>
-    //       <label>
-    //         Price:
-    //         <input type="number" value={price} onChange={e => setPrice(e.target.value)} />
-    //       </label>
-    //       <label>
-    //         Location:
-    //         <input type="text" value={location} onChange={e => setLocation(e.target.value)} />
-    //       </label>
-    //       <button type="submit">Post</button>
-    //     </form>
-    //   ) : (
-    //     <div className="only-customer-message">
-    //       Only customers can post. Please switch to a customer account to create posts.
-    //     </div>
-    //   )}
-    // </div>
   );
 };
 
