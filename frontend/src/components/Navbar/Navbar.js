@@ -1,12 +1,7 @@
-import { Box, Flex, Link, Text } from "@chakra-ui/react";
-import { useContext } from "react";
+import { Box, Flex, Link } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { UserContext } from "../User/UserContext";
 
-export default function Navbar() {
-
-  const user = useContext(UserContext)
-
+export default function Navbar({ userType }) {
   return (
     <Flex
       as="nav"
@@ -23,8 +18,16 @@ export default function Navbar() {
     >
       <Box>
         <NavLink to="/profile">Profile</NavLink>
-        
-        <NavLink to="/myposts" ml={45} uid={user.uid}>My Posts</NavLink>
+        {userType === "customer" && (
+          <>
+            <NavLink to="/myposts" ml={45}>My Posts</NavLink>
+          </>
+        )}
+        {userType === "business" && (
+          <>
+            <NavLink to="/mygigs" ml={45}>My Gigs</NavLink>
+          </>
+        )}
       </Box>
       <Flex align="center">
         <Link
@@ -38,8 +41,22 @@ export default function Navbar() {
         </Link>
       </Flex>
       <Box>
-        <NavLink to="/discover">Discover</NavLink>
-        <NavLink to="/post" ml={45}>Post</NavLink>
+        {userType === "customer" && (
+          <>
+            <NavLink to="/discoverbusinesses">Discover</NavLink>
+          </>
+        )}
+        {userType === "business" && (
+          <>
+            <NavLink to="/discoverposts">Discover</NavLink>
+            <NavLink to="/mybusiness" ml={45}>My Business</NavLink>
+          </>
+        )}
+        {userType === "customer" && (
+          <>
+            <NavLink to="/post" ml={45}>Post</NavLink>
+          </>
+        )}
       </Box>
     </Flex>
   );
@@ -61,3 +78,4 @@ function NavLink({ to, children, ...rest }) {
     </Link>
   );
 }
+

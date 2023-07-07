@@ -15,7 +15,7 @@ import {
   getDoc,
   setDoc,
 } from "firebase/firestore";
-import Dashboard from '../Routing/Routing';
+import Routing from '../Routing/Routing';
 
 const firebaseConfig = {
   apiKey: "CHANGE_WITH_PEROSNAL",
@@ -107,7 +107,7 @@ const Login = () => {
   if (user && !newUser) {
     return (
       <UserContext.Provider value={user}>
-        <Dashboard user={user} userType={userType} />
+        <Routing user={user} userType={userType} />
       </UserContext.Provider>
     );
   } else if (user && newUser) {
