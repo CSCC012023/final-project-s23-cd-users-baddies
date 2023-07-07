@@ -1,7 +1,12 @@
 import { Box, Flex, Link, Text } from "@chakra-ui/react";
+import { useContext } from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { UserContext } from "../User/UserContext";
 
 export default function Navbar() {
+
+  const user = useContext(UserContext)
+
   return (
     <Flex
       as="nav"
@@ -18,7 +23,8 @@ export default function Navbar() {
     >
       <Box>
         <NavLink to="/profile">Profile</NavLink>
-        <NavLink to="/message" ml={45}>Message</NavLink>
+        
+        <NavLink to="/myposts" ml={45} uid={user.uid}>My Posts</NavLink>
       </Box>
       <Flex align="center">
         <Link
