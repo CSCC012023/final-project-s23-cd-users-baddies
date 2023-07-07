@@ -2,19 +2,27 @@ import Navbar from "../Navbar/Navbar";
 import { Route, Routes } from "react-router-dom"
 import Profile from "../Profile/Profile";
 import Post from "../Post/Post"
-import Discover from "../Discover/Discover";
+import DiscoverPosts from "../Discover/DiscoverPosts";
+import DiscoverBusinesses from "../Discover/DiscoverPosts";
 import Home from "../Home/Home";
+import MyGigs from "../MyGigs/MyGigs";
+import MyPosts from "../MyPosts/MyPosts";
+import MyBusiness from "../MyBusiness/MyBusiness";
 
-export default function Routing() {
+export default function Routing({ user, userType }) {
     return (
         <div>
-            <Navbar/>
+            <Navbar user={user} userType={userType}/>
             <div className="container">
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/discover" element={<Discover />} />
+                    <Route path="/discoverPosts" element={<DiscoverPosts />} />
+                    <Route path="/discoverBusinesses" element={<DiscoverBusinesses />} />
                     <Route path="/post" element={<Post />} />
+                    <Route path="/myposts" element={<MyPosts />} />
+                    <Route path="/mygigs" element={<MyGigs />} />
+                    <Route path="/mybusiness" element={<MyBusiness />} />
                 </Routes>
             </div>
         </div>
