@@ -17,11 +17,6 @@ function App() {
       </header>
     </div>
     </ChakraProvider>
-    <div className="App">
-      <header className="App-header">
-        <Login />
-      </header>
-    </div>
   </div>
   );
 }
