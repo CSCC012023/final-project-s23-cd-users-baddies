@@ -1,0 +1,61 @@
+/* Styles for the Instagram post sharing page */
+body {
+  font-family: Arial, sans-serif;
+  background-color: black;
+  margin: 0;
+  padding: 0;
+  color: #333; /* Set the default text color to dark gray */
+}
+
+.containerr {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: grey;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #000; /* Set the h1 text color to black */
+}
+
+.form-group {
+  margin-bottom: 20px;
+  text-align: left; /* Align the labels and inputs to the left */
+}
+
+label {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #000; /* Set the label text color to black */
+}
+
+input[type="file"],
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  color: #000; /* Set the input and textarea text color to black */
+}
+
+textarea {
+  resize: vertical;
+}
+
+.share-button {
+  background-color: #3897f0;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+}
