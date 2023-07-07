@@ -43,12 +43,12 @@ export default function Navbar({ userType }) {
       <Box>
         {userType === "customer" && (
           <>
-            <NavLink to="/discoverbusinesses">Discover</NavLink>
+            <NavLink to="/discoverposts">Discover</NavLink>
           </>
         )}
         {userType === "business" && (
           <>
-            <NavLink to="/discoverposts">Discover</NavLink>
+            <NavLink to="/discoverbusinesses">Discover</NavLink>
             <NavLink to="/mybusiness" ml={45}>My Business</NavLink>
           </>
         )}

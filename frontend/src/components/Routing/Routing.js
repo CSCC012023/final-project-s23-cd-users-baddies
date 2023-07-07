@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom"
 import Profile from "../Profile/Profile";
 import Post from "../Post/Post"
 import DiscoverPosts from "../Discover/DiscoverPosts";
-import DiscoverBusinesses from "../Discover/DiscoverPosts";
+import DiscoverBusinesses from "../Discover/DiscoverBusinesses";
 import Home from "../Home/Home";
 import MyGigs from "../MyGigs/MyGigs";
 import MyPosts from "../MyPosts/MyPosts";
