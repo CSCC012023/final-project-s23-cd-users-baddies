@@ -16,6 +16,23 @@ import {
   setDoc,
 } from "firebase/firestore";
 import Dashboard from '../Routing/Routing';
+import {
+  Flex,
+  Heading,
+  Input,
+  Button,
+  InputGroup,
+  Stack,
+  Image,
+  Box,
+  Link,
+  Center,
+  FormControl,
+  FormHelperText,
+  InputRightElement,
+  Text,
+  Checkbox
+} from "@chakra-ui/react";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB-vRFrtFhIbXw2NHMj8VfBvi2iMU4kxwE",
@@ -114,33 +131,192 @@ const Login = () => {
     console.log(user);
     
     return (
-      <div className="user-type">
-        <p>Please provide your phone number and postal code:</p>
-        <input
-          type="text"
-          placeholder="Phone Number"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Postal Code"
-          value={postalCode}
-          onChange={(e) => setPostalCode(e.target.value)}
-        />
-        <p>Please select your user type:</p>
-        <button onClick={() => handleUserType('business')}>I'm a business</button>
-        <button onClick={() => handleUserType('customer')}>I'm a customer</button>
-      </div>
+
+<Flex
+      flexDirection="column"
+      width="100%"
+      height="100%"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Stack
+        flexDir="column"
+        mb="2"
+        justifyContent="center"
+        alignItems="center"
+      >
+        {/* <Avatar bg="teal.500" /> */}
+        <Image src='./bizreach-logo.png' alt='BizReach Logo' htmlWidth='200px'/>
+        <Heading color="teal.400">Create your account!</Heading>
+            <Stack
+              p="1rem"
+              // backgroundColor="whiteAlpha.900"
+              boxShadow="md"
+            >
+
+           
+             <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
+                  Email Address
+                </Text>
+  
+
+             <FormControl>
+                <InputGroup>
+                <Input type="email" placeholder="Email Address" pr="180px" pt='0%' mt='1%'/>
+                </InputGroup>
+              </FormControl>
+              <FormControl>
+
+
+              <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
+                  Password
+                </Text>
+                <InputGroup>
+                
+                  <Input
+                    placeholder="Password" mt='2%'
+                  />
+                  <InputRightElement width="4.5rem">
+                  </InputRightElement>
+                </InputGroup>
+                </FormControl>
+
+                <Heading color="teal.400" mt='10%'>Please select your user type</Heading>
+                
+
+            <Button
+                borderRadius={0}
+                type="submit"
+                variant="solid"
+                colorScheme="teal"
+                align='right'
+                mt='5%'
+                onClick={() => handleUserType('business')}
+  
+              >
+                I am a Business
+
+                
+              </Button>
+
+              <Button
+                borderRadius={0}
+                type="submit"
+                variant="solid"
+                colorScheme="teal"
+                mt='5%'
+                onClick={() => handleUserType('customer')}
+  
+              >
+                I am a Customer
+              </Button>
+
+            </Stack>
+
+            
+      </Stack>
+    </Flex>
+
+      
+
+      
+
+
+      // <div className="user-type">
+      //   <p>Please provide your phone number and postal code:</p>
+      //   <input
+      //     type="text"
+      //     placeholder="Phone Number"
+      //     value={phoneNumber}
+      //     onChange={(e) => setPhoneNumber(e.target.value)}
+      //   />
+      //   <input
+      //     type="text"
+      //     placeholder="Postal Code"
+      //     value={postalCode}
+      //     onChange={(e) => setPostalCode(e.target.value)}
+      //   />
+      //   <p>Please select your user type:</p>
+      //   <button onClick={() => handleUserType('business')}>I'm a business</button>
+      //   <button onClick={() => handleUserType('customer')}>I'm a customer</button>
+      // </div>
     );
   }
 
+
   return (
-    <div className="login-buttons">
-      <button onClick={signInWithGoogle}>Sign in with Google</button>
-      <button onClick={signInWithApple}>Sign in with Apple</button>
-    </div>
+
+
+    <Flex
+      flexDirection="column"
+      width="100wh"
+      height="100vh"
+      // backgroundColor="gray.200"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Stack
+        flexDir="column"
+        mb="2"
+        justifyContent="center"
+        alignItems="center"
+      >
+        {/* <Avatar bg="teal.500" /> */}
+        <Image src='./bizreach-logo.png' alt='BizReach Logo' htmlWidth='300px'/>
+        <Heading color="teal.400">Welcome To BizReach!</Heading>
+        <Box minW={{ base: "90%", md: "468px" }}>
+          <form>
+            <Stack
+              spacing={4}
+              p="1rem"
+              // backgroundColor="whiteAlpha.900"
+              boxShadow="md"
+            >
+              <FormControl>
+                <InputGroup>
+                  <Input type="email" placeholder="email address" />
+                </InputGroup>
+              </FormControl>
+              <FormControl>
+                <InputGroup>
+                
+                  <Input
+                    placeholder="Password"
+                  />
+                  <InputRightElement width="4.5rem">
+                  </InputRightElement>
+                </InputGroup>
+                <FormHelperText textAlign="right">
+                  <Link>forgot password?</Link>
+                </FormHelperText>
+              </FormControl>
+              <Button
+                borderRadius={0}
+                type="submit"
+                variant="solid"
+                colorScheme="teal"
+                width="full"
+              >
+                Login
+              </Button>
+            </Stack>
+          </form>
+        </Box>
+      </Stack>
+      <Box pb ="20px">
+        Or{" "}
+      </Box>
+
+      <Button onClick={signInWithGoogle}  borderRadius={0}
+                type="submit"
+                variant="solid"
+                colorScheme="teal"
+                width="full" 
+                >Sign in with Google</Button>
+    </Flex>
+
+
   );
-}
+};
 
 export default Login;
