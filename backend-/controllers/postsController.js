@@ -34,6 +34,7 @@ const createPost = async (uid, post) => {
 
       // Add the status field to the post object
       post.status = 'posted';
+      post.id = Date.now();
 
       userData.posts.push(post);
 

@@ -102,6 +102,8 @@ export class MapContainer extends Component {
     // Create the message
     const messageToAdd = {
       senderId: currentUser.uid,
+      postId: post.id,
+      senderName: currentUser.Business.Name,
       text: `Hi, I'm ${currentUser.Business.Name} and I would like to accept your gig.`,
       timestamp: Date.now(),
       type: "response"
