@@ -26,7 +26,6 @@ router.post('/users/:uid/posts', async (req, res) => {
       price,
       location,
       postalCode,
-      postedBy: uid,
     };
 
     const result = await postsController.createPost(uid, newPost);
@@ -40,3 +39,4 @@ router.post('/users/:uid/posts', async (req, res) => {
 // Define more routes as needed
 
 module.exports = router;
+
