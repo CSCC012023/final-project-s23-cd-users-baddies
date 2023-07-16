@@ -51,9 +51,11 @@ const getPostsFromCustomers = async () => {
 
   querySnapshot.forEach((doc) => {
     const userData = doc.data();
-    if (userData.userType === 'customer' && userData.Posts) {
-      userData.Posts.forEach((post) => {
-        posts.push(post);
+    if (userData.userType === 'customer' && userData.posts) {
+      userData.posts.forEach((post) => {
+        if (post.status === 'posted') { // Filter posts by status
+          posts.push(post);
+        }
       });
     }
   });
@@ -73,7 +75,8 @@ export class MapContainer extends Component {
       showingInfoWindow: false,
       activeMarker: {},
       selectedPost: null,
-      posts: []
+      posts: [],
+      notification: null,
     };
   }
 
@@ -88,19 +91,41 @@ export class MapContainer extends Component {
   async handlePostTransfer(post) {
     // Find the original poster
     const originalPosterRef = doc(db, 'Users', post.postedBy);  // assuming 'postedBy' field in each post contains the id of the original poster
-    // Remove the post from the original poster's 'Posts' array
-    await updateDoc(originalPosterRef, {
-      Posts: arrayRemove(post)
-    });
-  
+    
+    // Get the original post data to check if the 'messages' field exists
+    const docSnap = await getDoc(originalPosterRef);
+    
     // Get the current user
-    const currentUserRef = doc(db, 'Users', this.context.uid);  // assuming 'uid' field in the context contains the id of the current user
-    // Add the post to the current user's 'Gigs' array
-    await updateDoc(currentUserRef, {
-      Gigs: arrayUnion(post)
-    });
+    const currentUser = this.context;   // Current user from the context
+    const currentUserRef = doc(db, 'Users', currentUser.uid);  // assuming 'uid' field in the context contains the id of the current user
+    
+    // Create the message
+    const messageToAdd = {
+      senderId: currentUser.uid,
+      postId: post.id,
+      senderName: currentUser.Business.Name,
+      text: `Hi, I'm ${currentUser.Business.Name} and I would like to accept your gig.`,
+      timestamp: Date.now(),
+      type: "response"
+    };
   
-    console.log("Post transfer complete");
+    // If the 'messages' field doesn't exist, create it
+    if (!docSnap.data().messages) {
+      await setDoc(originalPosterRef, {
+        messages: [messageToAdd]
+      }, { merge: true });  // the { merge: true } option makes sure that the rest of the document is not overwritten
+    }
+    // If it does exist, just add a new message
+    else { 
+      await updateDoc(originalPosterRef, {
+        messages: arrayUnion(messageToAdd)
+      });
+    }
+  
+    console.log("Message sent");
+    this.setState({
+      notification: 'A message has been sent to the original poster.'
+    });
   }
   
   componentWillUnmount() {
@@ -109,6 +134,9 @@ export class MapContainer extends Component {
   }
 
   onMarkerClick = (props, marker, e) => {
+    this.setState({
+      notification: null
+    });
     if (this._isMounted) {
       this.setState({
         selectedPost: props.post,
@@ -158,6 +186,11 @@ export class MapContainer extends Component {
     const user = this.context;
     return (
       <div>
+        {this.state.notification && 
+          <div className="notification">
+            {this.state.notification}
+          </div>
+        }
         <Map
           containerStyle={containerStyle}
           resetBoundsOnResize={true}

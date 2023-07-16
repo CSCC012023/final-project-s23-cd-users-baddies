@@ -21,11 +21,13 @@ export default function Navbar({ userType }) {
         {userType === "customer" && (
           <>
             <NavLink to="/myposts" ml={45}>My Posts</NavLink>
+            <NavLink to="/messages" ml={45}>Messages</NavLink>  {/* New NavLink added */}
           </>
         )}
         {userType === "business" && (
           <>
             <NavLink to="/mygigs" ml={45}>My Gigs</NavLink>
+            <NavLink to="/messages" ml={45}>Messages</NavLink>  {/* New NavLink added */}
           </>
         )}
       </Box>
@@ -78,4 +80,3 @@ function NavLink({ to, children, ...rest }) {
     </Link>
   );
 }
-
