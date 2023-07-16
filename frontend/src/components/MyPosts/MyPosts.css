@@ -1,0 +1,10 @@
+.page-title {
+}
+
+.post-container {
+  margin-top: 10%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 20px;
+}
