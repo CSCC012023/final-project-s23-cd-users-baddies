@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get business users
-router.get('/business', async (req, res) => {
+router.get('/businesses', async (req, res) => {
     try {
       const businessUsers = await getBusinessUsers();
       res.json(businessUsers);
@@ -29,7 +29,7 @@ router.get('/business', async (req, res) => {
 router.get('/profile/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const userProfile = await getUserProfile(userId);
+    const userProfile = await getUserProfile(userId); // Use userId (which is the UID) to fetch the user profile
     res.json(userProfile);
   } catch (error) {
     console.error('Error getting user profile:', error);
@@ -41,8 +41,8 @@ router.get('/profile/:userId', async (req, res) => {
 router.put('/profile/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { name, email, password } = req.body;
-    await updateUserProfile(userId, { name, email, password });
+    const updateFields = req.body;
+    await updateUserProfile(userId, updateFields);
     res.json({ message: 'User profile updated successfully' });
   } catch (error) {
     console.error('Error updating user profile:', error);

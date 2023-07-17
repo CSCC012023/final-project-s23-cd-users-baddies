@@ -46,7 +46,7 @@ const registerProcess = async (req, res) => {
     const { uid, userType, contactNumber, postalCode } = req.body;
 
     // Save the user information to the Firestore database
-    const userDocRef = firestore.collection('Users').doc(uid);
+    const userDocRef = firestore.collection('User').doc(uid);
     const newUser = {
       uid,
       userType,
