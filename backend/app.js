@@ -11,9 +11,13 @@ app.use(cors());
 const postRoutes = require('./routes/posts');
 const usersRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
+const messagesRoutes = require('./routes/messages');
+const gigsRoutes = require('./routes/gigs');
 app.use('/api/posts', postRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/auths', authRoutes);
+app.use('/api/messages', messagesRoutes);
+app.use('/api/gigs', gigsRoutes);
 
 // Start the server
 const port = 3000;

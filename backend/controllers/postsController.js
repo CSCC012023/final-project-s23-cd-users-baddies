@@ -4,7 +4,7 @@ const { db } = require('../firebase');
 const getUserPosts = async (uid) => {
   try {
     const postsRef = db.collection('Posts');
-    const querySnapshot = await postsRef.where('postedBy', '==', db.doc(`Users/${uid}`)).get();
+    const querySnapshot = await postsRef.where('postedBy', '==', db.doc(`User/${uid}`)).get();
 
     const posts = [];
     querySnapshot.forEach((doc) => {
@@ -24,7 +24,7 @@ const createPost = async (uid, post) => {
     // Add the status field to the post object
     post.status = 'posted';
     post.pid = Date.now().toString(); // Use a string representation for pid field (for consistency with Firestore)
-    post.postedBy = db.doc(`Users/${uid}`); // Reference to the user who created the post
+    post.postedBy = db.doc(`User/${uid}`); // Reference to the user who created the post
 
     const postsRef = db.collection('Posts');
     await postsRef.doc(post.pid).set(post);

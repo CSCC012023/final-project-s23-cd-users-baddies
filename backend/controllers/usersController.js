@@ -3,7 +3,7 @@ const { db } = require('../firebase');
 // Get all users
 const getAllUsers = async () => {
   try {
-    const usersRef = db.collection('Users');
+    const usersRef = db.collection('User');
     const usersSnapshot = await usersRef.get();
 
     const users = [];
@@ -20,30 +20,27 @@ const getAllUsers = async () => {
 };
 
 // Get user profile
-const getUserProfile = async (req, res) => {
+const getUserProfile = async (uid) => {
   try {
-    const { userId } = req.params;
-
-    // Logic to fetch user profile from the database based on the userId
-    const userRef = db.collection('Users').doc(userId);
+    const userRef = db.collection('User').doc(uid);
     const userDoc = await userRef.get();
 
     if (userDoc.exists) {
       const userProfile = userDoc.data();
-      res.json(userProfile);
+      return userProfile; // Return the userProfile instead of sending the response directly
     } else {
-      res.status(404).json({ error: 'User not found' });
+      throw new Error('User not found');
     }
   } catch (error) {
     console.error('Error getting user profile:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    throw new Error('Internal server error');
   }
 };
 
 // Get business users
 const getBusinessUsers = async () => {
   try {
-    const usersRef = db.collection('Users');
+    const usersRef = db.collection('User');
     const querySnapshot = await usersRef.where('userType', '==', 'business').get();
 
     const businessUsers = [];
@@ -61,24 +58,19 @@ const getBusinessUsers = async () => {
 
 
 // Update user profile
-const updateUserProfile = async (req, res) => {
+const updateUserProfile = async (userId, updateFields) => {
   try {
-    const { userId } = req.params;
-    const { name, email, password } = req.body;
-
-    // Logic to update user profile in the database based on the userId
-    const userRef = db.collection('Users').doc(userId);
+    const userRef = db.collection('User').doc(userId);
     const userDoc = await userRef.get();
 
     if (userDoc.exists) {
-      await userRef.update({ name, email, password });
-      res.json({ message: 'User profile updated successfully' });
+      await userRef.update(updateFields);
     } else {
-      res.status(404).json({ error: 'User not found' });
+      throw new Error('User not found');
     }
   } catch (error) {
     console.error('Error updating user profile:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    throw error; // Re-throw the error to be handled in the route
   }
 };
 
