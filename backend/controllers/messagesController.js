@@ -75,7 +75,7 @@ const getChatContacts = async (uid) => {
         const senderId = message.sender; // Assuming you stored the user IDs in the 'id' field
   
         // Exclude the current user from the chat contacts list
-        if (senderId !== userId) {
+        if (senderId !== uid) {
           const timestamp = message.timestamp;
           const existingContact = chatContactsMap.get(senderId);
   
@@ -84,7 +84,7 @@ const getChatContacts = async (uid) => {
             existingContact.timestamp = Math.max(existingContact.timestamp, timestamp);
           } else {
             chatContactsMap.set(senderId, {
-              userId: senderId,
+              uid: senderId,
               timestamp,
             });
           }
