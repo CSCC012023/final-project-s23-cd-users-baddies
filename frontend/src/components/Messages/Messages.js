@@ -22,7 +22,7 @@ import {
 } from "@chakra-ui/react";
 
 const SideBar = ({ handleContactSelect }) => {
-  // const user = useContext(UserContext);
+  const user = useContext(UserContext);
   const [chatContacts, setChatContacts] = useState([]);
 
   const sampleChatContacts = [
@@ -67,7 +67,7 @@ const SideBar = ({ handleContactSelect }) => {
       >
         <Avatar mt="75px" ml="20px"></Avatar>
         <Flex align="center" justifyContent="space-between" mt="10vh" marginEnd={3} p="3">
-          <Text color="teal.400">{"user.Name"}</Text>
+          <Text color="teal.400">{user.Name}</Text>
         </Flex>
       </Flex>
       <Flex flexDirection="column" overflowX="scroll" sx={{ scrollbarWidth: "0px" }} flex={1}>
