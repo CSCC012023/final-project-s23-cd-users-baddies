@@ -1,7 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../User/UserContext';
-// import { Button, Box, Divider } from "@chakra-ui/react";
-import { getFirestore, doc,setDoc, getDoc, updateDoc, arrayRemove ,arrayUnion} from "firebase/firestore";
 import {
   Flex,
   Heading,
@@ -11,7 +9,6 @@ import {
   Stack,
   Image,
   Box,
-
   ArrowLeftIcon,
   IconButton,
   Link,
@@ -24,134 +21,23 @@ import {
   Avatar
 } from "@chakra-ui/react";
 
-
-const SideBar = () => {
-
-  const user = useContext(UserContext);
-
-  return(
-    <Flex
-    h="100vh"
-    w="50vh"
-    borderEnd='1px solid'
-    borderColor='#50545c'
-    // borderEnd="1px solid" borderColor="gray.200"
-    direction="column"
-    
-    
-  >
-
-    <Flex
-    
-    // bg="red.100"
-    w="100%"
-    h="20vh"
-    align="center"
-    borderBottom="1px solid"
-    borderColor='#50545c'>
-      
-      <Avatar mt="75px" ml="20px" src={user.photoURL}></Avatar>
-
-      <Flex 
-      align="center" justifyContent={"space-between"} 
-      mt="10vh" marginEnd={3} p='3'>
-        <Text color='teal.400'>
-          {user.Name}
-        </Text>
-      </Flex>
-
-    </Flex>
-
-    <Flex flexDirection={"column"} overflowX={"scroll"} sx={{scrollbarWidth: "0px"}} flex={1}>
-      <Chat/>
-      <Chat/>
-      <Chat/>
-      <Chat/>
-      <Chat/>
-      <Chat/>
-      <Chat/>
-      <Chat/>
-    </Flex>
-  </Flex>
-  )
-}
-
-const Chat = () => {
-
-  return(
-    <Flex m='3'p={3} align={"center"} _hover={{bg:"teal.400", cursor:"pointer"}} >
-
-      <Avatar src=""/>
-      <Text ml="10px">User</Text>
-
-
-    </Flex>
-  )
-}
-const TopBar = () => {
-
-  return(
-    <Flex
-    // bg="teal.100"
-    w="100%"
-    h="20vh"
-    align="center"
-    borderBottom="1px solid"
-    borderColor='#50545c'
-    >
-
-      <Avatar mt='10vh' src="" ml='3'/>
-
-      <Text color='white' align="center" justifyContent={"space-between"} 
-        mt="10vh" marginEnd={3} p='3'>
-            User
-          </Text>
-
-
-    </Flex>
-  )
-}
-
-const BottomBar = () => {
-
-  return(
-
-    <FormControl padding={3} justifyContent={"space-between"} >
-
-      <Input w="70%" placeholder='Type a message'/>
-
-      <Button w="10%" type="submit" hidden>Send </Button>
-
-      </FormControl>
-  )
-}
-
-const Messages = () => {
-  const [selectedContact, setSelectedContact] = useState(null);
+const SideBar = ({ handleContactSelect }) => {
+  // const user = useContext(UserContext);
   const [chatContacts, setChatContacts] = useState([]);
 
-  // Fetch chat contacts from the API
-  const user = useContext(UserContext);
-  
+  const sampleChatContacts = [
+    { id: 1, name: "John Doe", avatar: "" },
+    { id: 2, name: "Jane Smith", avatar: "" },
+    { id: 3, name: "Alice Johnson", avatar: "" },
+    // Add more sample contacts as needed
+  ];
+
   useEffect(() => {
     const fetchChatContacts = async () => {
       try {
-        const response = await fetch(`http://localhost:3001/api/messages/contacts/${user.uid}`,{
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            title,
-            description,
-            price,
-            location: { lat, lon },
-            postalCode,
-          })
-        });
+        const response = await fetch(`http://localhost:3000/api/messages/contacts/VB4yMIbysHUjx2MOBLj8`);
         if (response.ok) {
           const chatContactsData = await response.json();
-          console.log(chatContactsData);
           setChatContacts(chatContactsData);
         } else {
           console.error('Error getting contacts:', response.statusText);
@@ -162,53 +48,175 @@ const Messages = () => {
     };
 
     fetchChatContacts();
-  }, [user.uid]);
+  }, []);
 
-  // Function to handle contact selection
-  const handleContactSelect = (contact) => {
-    setSelectedContact(contact);
+  return (
+    <Flex
+      h="100vh"
+      w="50vh"
+      borderEnd="1px solid"
+      borderColor="#50545c"
+      direction="column"
+    >
+      <Flex
+        w="100%"
+        h="20vh"
+        align="center"
+        borderBottom="1px solid"
+        borderColor="#50545c"
+      >
+        <Avatar mt="75px" ml="20px"></Avatar>
+        <Flex align="center" justifyContent="space-between" mt="10vh" marginEnd={3} p="3">
+          <Text color="teal.400">{"user.Name"}</Text>
+        </Flex>
+      </Flex>
+      <Flex flexDirection="column" overflowX="scroll" sx={{ scrollbarWidth: "0px" }} flex={1}>
+        {sampleChatContacts.map((contact) => (
+          <Chat key={contact.id} contact={contact} handleContactSelect={handleContactSelect} />
+        ))}
+      </Flex>
+    </Flex>
+  );
+};
+
+const Chat = ({ contact, handleContactSelect }) => {
+  const handleClick = () => {
+    handleContactSelect(contact);
   };
 
   return (
-
-    <Flex h="100%">
-
-      <SideBar/>
-
-
-    <Flex 
-      flex="1" direction="column">
-
-      <TopBar/>
-
-
-      <Flex h="70vh" direction={"column"} pt="4" mx="5" overflowX={"auto"} > 
-
-      <Flex bg="whiteAlpha.100" w="fit-content" minWidth={"100px"} borderRadius={"lg"} p="3" m="1">
-
-        <Text>This is a message</Text>
-      </Flex>
-      <Flex bg="whiteAlpha.100" w="fit-content" minWidth={"100px"} borderRadius={"lg"} p="3" m="1">
-
-        <Text>This is a message</Text>
-      </Flex>
-      <Flex bg="teal.400" w="fit-content" minWidth={"100px"} borderRadius={"lg"} p="3" m="1" alignSelf={"flex-end"}>
-
-        <Text>This is a message</Text>
-      </Flex>
-
-      
-      
-      
-      
-      </Flex>
-
-      <BottomBar/>
-
-      </Flex>
-
+    <Flex m="3" p={3} align="center" _hover={{ bg: "teal.400", cursor: "pointer" }} onClick={handleClick}>
+      <Avatar src={contact.avatar} />
+      <Text ml="10px">{contact.name}</Text>
     </Flex>
+  );
+};
 
+const TopBar = ({ selectedContact }) => {
+  return (
+    <Flex w="100%" h="20vh" align="center" borderBottom="1px solid" borderColor="#50545c">
+      <Avatar mt="10vh" src={selectedContact.avatar} ml="3" />
+      <Text color="white" align="center" justifyContent="space-between" mt="10vh" marginEnd={3} p="3">
+        {selectedContact.name}
+      </Text>
+    </Flex>
+  );
+};
+
+const BottomBar = ({ handleSendMessage }) => {
+  const [messageText, setMessageText] = useState('');
+
+  const sendMessage = () => {
+    handleSendMessage(messageText);
+    setMessageText('');
+  };
+
+  return (
+    <FormControl padding={3} justifyContent="space-between">
+      <Input
+        w="70%"
+        placeholder="Type a message"
+        value={messageText}
+        onChange={(e) => setMessageText(e.target.value)}
+      />
+      <Button w="10%" onClick={sendMessage}>
+        Send
+      </Button>
+    </FormControl>
+  );
+};
+
+const Messages = () => {
+  const [selectedContact, setSelectedContact] = useState(null);
+  const [chatMessagesData, setChatMessagesData] = useState([]);
+
+  const handleContactSelect = (contact) => {
+    setSelectedContact(contact);
+    const fetchChatMessages = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:3000/api/messages/xqZkfFFi6SHefADzUIH2/VB4yMIbysHUjx2MOBLj8`
+        ); 
+        if (response.ok) {
+          const chatMessagesData = await response.json();
+          setChatMessagesData(chatMessagesData);
+        } else {
+          console.error('Error getting chat messages:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error fetching chat messages:', error);
+      }
+    };
+
+    fetchChatMessages();
+  };
+
+  const handleSendMessage = async (text) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3000/api/messages/VB4yMIbysHUjx2MOBLj8/xqZkfFFi6SHefADzUIH2`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ text }),
+        }
+      );
+
+      if (response.ok) {
+
+        const newMessage = {
+          text,
+          sender: { _path: { segments: [''] } }, // Assume the current user is the sender
+        };
+        setChatMessagesData((prevChatMessages) => [prevChatMessages, newMessage]);
+        console.log(chatMessagesData)
+        // setMessageText(''); // Clear the input field
+      } else {
+        console.error('Error sending message:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
+  return (
+    <Flex h="100%">
+      <SideBar handleContactSelect={handleContactSelect} />
+      <Flex flex="1" direction="column">
+        {selectedContact && (
+          <>
+            <TopBar selectedContact={selectedContact} />
+            <Flex h="70vh" direction="column" pt="4" mx="5" overflowX="auto">
+              {chatMessagesData.map((message, index) => (
+                <Message key={index} message={message} />
+              ))}
+            </Flex>
+            <BottomBar handleSendMessage={handleSendMessage} />
+          </>
+        )}
+      </Flex>
+    </Flex>
+  );
+};
+
+const Message = ({ message }) => {
+  const isSentByCurrentUser = message.sender && message.sender._path.segments[1] === 'VB4yMIbysHUjx2MOBLj8';
+  return (
+    <Flex
+      bg={isSentByCurrentUser ? "teal.400" : "whiteAlpha.100"}
+      color={isSentByCurrentUser ? "white" : "inherit"}
+      w="fit-content"
+      minWidth="100px"
+      borderRadius="lg"
+      p="3"
+      m="1"
+      alignSelf={isSentByCurrentUser ? "flex-end" : "flex-start"}
+      marginLeft={isSentByCurrentUser ? "auto" : "unset"} // Add this line
+    >
+      <Text>{message.text}</Text>
+    </Flex>
   );
 };
 
