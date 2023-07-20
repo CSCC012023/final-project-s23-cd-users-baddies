@@ -2,7 +2,7 @@ import Navbar from "../Navbar/Navbar";
 import { Route, Routes } from "react-router-dom"
 import Profile from "../Profile/Profile";
 import Post from "../Post/Post"
-import DiscoverPosts from "../Discover/DiscoverPosts";
+import DiscoverPosts from "../Discover/customer/DiscoverPosts";
 import DiscoverBusinesses from "../Discover/DiscoverBusinesses";
 import Home from "../Home/Home";
 import MyGigs from "../MyGigs/MyGigs";

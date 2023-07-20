@@ -1,0 +1,43 @@
+.my-modal-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 600px;
+  width: 80%;
+  max-width: 600px; /* Add a maximum width if desired */
+  height: auto; /* Remove if you want a fixed height */
+}
+
+.modal-content {
+  background-color: white;
+  border-radius: 10px;
+}
+
+.modal-header {
+  text-align: center;
+}
+
+.modal-title {
+  margin: 0;
+  padding: 10px;
+}
+
+.modal-body {
+  margin-top: 10;
+  text-align: center;
+}
+
+.modal-text {
+  margin: 0;
+}
+
+.modal-footer {
+  text-align: center;
+  padding: 20px;
+}
+
+.modal-button {
+  margin: 0 auto;
+  padding: 10px 20px;
+}

@@ -16,7 +16,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import './Discover.css';
+import './customer/Discover.css';
 import bisimg from './businessimg.jpeg';
 
 const DiscoverBusinesses = () => {
@@ -28,7 +28,7 @@ const DiscoverBusinesses = () => {
     // Fetch businesses data from the server
     const fetchBusinesses = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/users/business/');
+        const response = await axios.get('http://localhost:3000/api/users/businesses/');
         setBusinesses(response.data);
       } catch (error) {
         console.error('Error fetching businesses:', error);

@@ -72,7 +72,7 @@ const Login = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const docRef = doc(db, 'Users', user.uid);
+        const docRef = doc(db, 'User', user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -127,7 +127,7 @@ const Login = () => {
       console.log("hi");
       setShowBusinessForm(true);
     } else {
-      await setDoc(doc(db, 'Users', auth.currentUser.uid), userData);
+      await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
       setUserType(type);
       setUser(userData);
       setNewUser(false);
@@ -155,7 +155,7 @@ const Login = () => {
       Location: location,
     };
 
-    await setDoc(doc(db, 'Users', auth.currentUser.uid), userData);
+    await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
     setUserType('business');
     setUser(userData);
     setNewUser(false);
