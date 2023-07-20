@@ -48,7 +48,7 @@ const updateGigStatus = async (gid, newStatus) => {
       console.error('Error updating gig status:', error);
       throw new Error('Internal server error');
     }
-  };
+};
   
   // Function to delete a gig
   const deleteGig = async (gid, uid) => {

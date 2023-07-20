@@ -23,14 +23,31 @@ router.post('/users/:uid/posts', async (req, res) => {
     const newPost = {
       title,
       description,
-      price,
-      location,
+      price: parseFloat(price), // Convert to a number
+      location: {
+        lat: parseFloat(location.lat), // Convert to a number
+        lon: parseFloat(location.lon) // Convert to a number
+      },
       postalCode,
+      postedBy: `/User/${uid}`, // Reference to the user who created the post
+      status: 'posted',
+      pid: Date.now().toString() // Use a string representation for pid field (for consistency with Firestore)
     };
 
-    const result = await postsController.createPost(uid, newPost);
+    const result = await postsController.createPost(uid, newPost, req.app.get('io')); // Pass req.app.get('io')
+
 
     res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Route to get all posts
+router.get('/', async (req, res) => {
+  try {
+    const allPosts = await postsController.getAllPosts();
+    res.status(200).json(allPosts);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -39,4 +56,5 @@ router.post('/users/:uid/posts', async (req, res) => {
 // Define more routes as needed
 
 module.exports = router;
+
 

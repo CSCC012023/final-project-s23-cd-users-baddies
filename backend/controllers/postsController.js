@@ -1,4 +1,4 @@
-const { db } = require('../firebase');
+const { db, io } = require('../firebase');
 
 // Function to retrieve posts of a user by UID
 const getUserPosts = async (uid) => {
@@ -19,15 +19,20 @@ const getUserPosts = async (uid) => {
 };
 
 // Function to create a new post for a user
-const createPost = async (uid, post) => {
+const createPost = async (uid, post, io) => {
   try {
-    // Add the status field to the post object
-    post.status = 'posted';
-    post.pid = Date.now().toString(); // Use a string representation for pid field (for consistency with Firestore)
-    post.postedBy = db.doc(`User/${uid}`); // Reference to the user who created the post
-
     const postsRef = db.collection('Posts');
-    await postsRef.doc(post.pid).set(post);
+    const postDocRef = postsRef.doc(post.pid);
+    
+    // Convert the uid to a Firestore document reference
+    const userDocRef = db.doc(`User/${uid}`);
+    postDocRef.set({
+      ...post,
+      postedBy: userDocRef, // Set postedBy as a reference to the User document
+    });
+
+    // After creating the post, emit a 'newPost' event to notify all connected clients about the new post
+    io.emit('newPost', post);
 
     return { message: 'Post created successfully' };
   } catch (error) {
@@ -36,4 +41,23 @@ const createPost = async (uid, post) => {
   }
 };
 
-module.exports = { getUserPosts, createPost };
+// Function to get all posts
+const getAllPosts = async () => {
+  try {
+    const postsRef = db.collection('Posts');
+    const querySnapshot = await postsRef.get();
+
+    const allPosts = [];
+    querySnapshot.forEach((doc) => {
+      allPosts.push(doc.data());
+    });
+
+    return allPosts;
+  } catch (error) {
+    console.error('Error getting all posts:', error);
+    throw new Error('Internal server error');
+  }
+};
+
+module.exports = { getUserPosts, createPost, getAllPosts };
+
