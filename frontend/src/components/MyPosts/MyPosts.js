@@ -45,6 +45,7 @@ const MyPosts = () => {
           })
         );
         setPosts(postsWithAddresses);
+        console.log(posts)
       } catch (error) {
         console.error('Error fetching user posts:', error);
       }
