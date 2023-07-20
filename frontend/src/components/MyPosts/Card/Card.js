@@ -1,39 +1,52 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import './Card.css'; // Import the CSS file
+import getAddressFromCoordinates from '../../../utils/utils';
 
-function PostCard({ title, description, price, location, postalCode }) {
-  const navigate = useNavigate();
+function PostCard({ title, description, price, location, postalCode, onViewMap }) {
+  const [address, setAddress] = useState('');
+
+  useEffect(() => {
+    convertCoordinatesToAddress();
+  });
+
+  const convertCoordinatesToAddress = async () => {
+    try {
+      console.log(location.lat, location.lon)  
+      const address = await getAddressFromCoordinates(location.lat, location.lon);
+      setAddress(address);
+    } catch (error) {
+      console.error('Error converting coordinates to address:', error);
+    }
+  };
 
   const handleButtonClick = () => {
-    navigate('/discover'); // Navigate to the '/post' page
+    onViewMap(); // Call the onViewMap prop
   };
 
   return (
-    <Card className="post-card">
-      <Card.Body className="post-card-body">
-        <Card.Title className="post-card-title">
-          <strong>Title:</strong> {title}
-        </Card.Title>
-        <Card.Text className="post-card-description">
-          <strong>Description:</strong> {description}
-        </Card.Text>
-        <Card.Text className="post-card-text">
-          <strong>Price:</strong> {price}
-        </Card.Text>
-        <Card.Text className="post-card-text">
-          <strong>Location:</strong> {location.lon}, {location.lat}
-        </Card.Text>
-        <Card.Text className="post-card-text">
-          <strong>Postal Code:</strong> {postalCode}
-        </Card.Text>
-        <Button variant="primary" className="post-card-button" onClick={handleButtonClick}>
-          View on Map
-        </Button>
-      </Card.Body>
-    </Card>
+    <>
+      <Card className="post-card">
+        <Card.Body className="post-card-body">
+          <Card.Title className="post-card-title">
+            <strong>Title:</strong> {title}
+          </Card.Title>
+          <Card.Text className="post-card-text">
+            <strong>Price:</strong> ${price}
+          </Card.Text>
+          <Card.Text className="post-card-text">
+            <strong>Location:</strong> {address}
+          </Card.Text>
+          <Card.Text className="post-card-text">
+            <strong>Postal Code:</strong> {postalCode}
+          </Card.Text>
+          <Button variant="primary" className="post-card-button" onClick={handleButtonClick}>
+            Details
+          </Button>
+        </Card.Body>
+      </Card>
+    </>
   );
 }
 
