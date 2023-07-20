@@ -1,5 +1,5 @@
 async function getAddressFromCoordinates(latitude, longitude) {
-    const apiKey = 'YOUR_GOOGLE_MAPS_API_KEY'; // Replace with your own API key
+    const apiKey = 'CHANGE_WITH_PEROSNAL';
     const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
   
     try {
