@@ -84,7 +84,7 @@ const getChatContacts = async (uid) => {
             existingContact.timestamp = Math.max(existingContact.timestamp, timestamp);
           } else {
             chatContactsMap.set(senderId, {
-              uid: senderId,
+              userId: senderId,
               timestamp,
             });
           }
