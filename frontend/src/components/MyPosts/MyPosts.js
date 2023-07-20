@@ -1,134 +1,158 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { UserContext } from '../User/UserContext';
-import { Button, Box, Divider, AlertDialog, AlertDialogOverlay, AlertDialogContent, AlertDialogHeader, AlertDialogBody, AlertDialogFooter } from "@chakra-ui/react";
-import { getFirestore, doc, getDoc, updateDoc, arrayRemove, collection, arrayUnion, query, where, getDocs } from "firebase/firestore";
+import getAddressFromCoordinates from '../../utils/utils';
+import {
+  Card,
+  Stack,
+  Heading,
+  Text,
+  ButtonGroup,
+  CardBody,
+  CardFooter,
+  Button,
+  Box,
+  Divider,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure 
+} from "@chakra-ui/react";
+import axios from 'axios';
 
-const db = getFirestore(); // assume firebase is already initialized
 
 const MyPosts = () => {
   const user = useContext(UserContext);
   const [posts, setPosts] = useState([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [currentPost, setCurrentPost] = useState(null);
-  const [btnRef, setBtnRef] = useState(null);
+  const [filteredStatus, setFilteredStatus] = useState("posted");
 
-  const onClose = () => setIsOpen(false);
-
-  const fetchPosts = async () => {
-    const userRef = doc(db, 'Users', user.uid);
-    const userSnapshot = await getDoc(userRef);
-
-    if (userSnapshot.exists() && userSnapshot.data().posts) {
-      setPosts(userSnapshot.data().posts);
-    }
-  }
-
-  const handleComplete = async () => {
-    if (currentPost) {
-      // At complete job, switch the post status to 'completed'
-      const updatedStatus = 'completed';
-      const updatedPost = { ...currentPost, status: updatedStatus };
-
-      // Replace the post in user's document and local state
-      const userRef = doc(db, 'Users', user.uid);
-      const updatedPosts = posts.map((curPost) =>
-        curPost.postId === updatedPost.postId ? updatedPost : curPost
-      );
-
-      await updateDoc(userRef, { posts: updatedPosts });
-      setPosts(updatedPosts);
-
-      // Find all businesses who have this post in their gigs
-      const businessesSnapshot = await getDocs(query(collection(db, 'Users'), where('userType', '==', 'business')));
-      businessesSnapshot.forEach(async (businessDoc) => {
-        const businessData = businessDoc.data();
-
-        if (businessData.Gigs && businessData.Gigs.find((gig) => gig.postId === updatedPost.id)) {
-          // Map over gigs, update the one with matching postId
-          const updatedGigs = businessData.Gigs.map((gig) =>
-            gig.postId === updatedPost.id ? { ...gig, status: 'completed' } : gig
-          );
-
-          // Update gigs in Firestore
-            await updateDoc(doc(db, 'Users', businessData.uid), { Gigs: updatedGigs });
-            const newMessage = {
-                text: `Job '${currentPost.title}' has been completed.`,
-                timestamp: Date.now(),
-                type: 'notification',
-              };
-            
-              // Add the new message to business's messages array
-              // Check if the messages array exists. If not, initialize it.
-              let updatedMessages = businessData.messages ? [...businessData.messages, newMessage] : [newMessage];
-            
-              // Update gigs and messages in Firestore
-              await updateDoc(doc(db, 'Users', businessData.uid), { Gigs: updatedGigs, messages: updatedMessages });
-        }
-      });
-    }
-
-    onClose(); // Close the dialog
-  }
-
-  const promptCompleteDialog = (post) => {
-    setIsOpen(true);
-    setCurrentPost(post);
-    setBtnRef(document.getElementById(post.postId)); // Set reference for dialog
-  }
+  const filterPostsByStatus = (status) => {
+    setFilteredStatus(status);
+  };
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    const fetchUserPosts = async () => {
+      try {
+        // console.log(user.uid);
+        const response = await axios.get(`http://localhost:3000/api/posts/users/${user.uid}/posts`);
+        const postsWithAddresses = await Promise.all(
+          response.data.map(async (post) => {
+            const address = await getAddressFromCoordinates(post.location.lat, post.location.lon);
+            return { ...post, address };
+          })
+        );
+        setPosts(postsWithAddresses);
+      } catch (error) {
+        console.error('Error fetching user posts:', error);
+      }
+    };
+  
+    fetchUserPosts();
+  }, [user.uid]);
+  
+   
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
-    <Box maxW="sm" borderWidth={1} borderRadius="lg" overflow="hidden" mt={6}>
-      <Box p="6">
-        {posts.map((post, index) => (
-          <Box key={index} d="flex" alignItems="baseline" mb={4}>
-            <Box
-              color="gray.500"
-              fontWeight="semibold"
-              letterSpacing="wide"
-              fontSize="xs"
-              textTransform="uppercase"
-            >
-              {post.title}
-            </Box>
-            <Divider mt={2} mb={2} />
-            <Box mt="1" fontWeight="semibold" as="h4" lineHeight="tight">
-              Status: {post.status}
-            </Box>
-            <Button id={post.postId} colorScheme="teal" size="xs" mt={3} onClick={() => promptCompleteDialog(post)}>Complete Job</Button>
-          </Box>
-        ))}
-        <AlertDialog
-          isOpen={isOpen}
-          leastDestructiveRef={btnRef}
-          onClose={onClose}
+    <div>
+        <Box
+        position="fixed"
+        top={120}
+        left={0}
+        right={0}
+        display="flex"
+        justifyContent="center"
+        p={4}
         >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Complete Job
-              </AlertDialogHeader>
+          <Stack spacing={3} direction="row" align="center" display="flex">
+            <Button colorScheme="teal" onClick={() => filterPostsByStatus("posted")}>
+              Posted
+            </Button>
+            <Button colorScheme="red" onClick={() => filterPostsByStatus("in-progress")}>
+              In Progress
+            </Button>
+            <Button colorScheme="teal" onClick={() => filterPostsByStatus("completed")}>
+              Completed
+            </Button>
+          </Stack>
+        </Box>
+        <Text mt={10} position="fixed" top={180} left={0} right={0} textAlign="center" fontSize="xl" fontWeight="bold">
+          {filteredStatus.charAt(0).toUpperCase() + filteredStatus.slice(1)}
+        </Text>
+      
+      {posts.filter((post) => post.status === filteredStatus).length > 0 && (
+        <div className="post-container">
+          <Box display="flex" flexWrap="wrap">
+            {posts
+              .filter((post) => post.status === filteredStatus)
+              .map((post) => (
+                <Card key={post.id} maxW="sm" flex="none" width="250px" m={6}>
+                  <Box borderWidth={1} borderRadius="lg" overflow="hidden">
+                    <CardBody>
+                      <Stack mt="6" spacing="4">
+                        <Heading size="lg">{post.title}</Heading>
+                        <Text fontSize="lg">Status: {post.status}</Text>
+                        <Text color="blue.600" fontSize="xl">
+                          ${post.price}
+                        </Text>
+                      </Stack>
+                    </CardBody>
+                    <Divider />
+                    <CardFooter>
+                      <ButtonGroup spacing="2" margin="10px" >
+                        <Button onClick={onOpen} variant="solid" colorScheme="blue" ml={post.status === "posted" || post.status === "completed"? "50px" : "flex-start"} >
+                          Details
+                        </Button>
+                        <Modal isOpen={isOpen} onClose={onClose}>
+                          <ModalOverlay />
+                          <ModalContent
+                            position="absolute"
+                            top="25%"
+                            transform="translate(-50%, -50%)"
+                            maxW="80%" // Optional: Set the maximum width of the modal
+                            width="fit-content" // Optional: Adjust the width based on the modal content
+                          >
+                            <ModalHeader>{post.title}</ModalHeader>
+                            <ModalCloseButton />
+                            <ModalBody>
+                              <Text>Description: {post.description}</Text>
+                              <Text>Location: {post.address}</Text>
+                              <Text>Price: ${post.price}</Text>
+                            </ModalBody>
 
-              <AlertDialogBody>
-                Are you sure? You cannot undo this action afterwards.
-              </AlertDialogBody>
+                            <ModalFooter>
+                              <Button colorScheme='blue' mr={3} onClick={onClose}>
+                                Close
+                              </Button>
+                            </ModalFooter>
+                          </ModalContent>
+                        </Modal>
+                        {post.status === "in-progress" && (
+                        <Button variant="solid" colorScheme="teal">
+                          Complete
+                        </Button>
+                      )}
+                      </ButtonGroup>
+                    </CardFooter>
+                  </Box>
+                </Card>
+              ))}
+          </Box>
+        </div>
+      )}
 
-              <AlertDialogFooter>
-                <Button ref={btnRef} onClick={onClose}>
-                  Cancel
-                </Button>
-                <Button colorScheme="green" onClick={handleComplete} ml={3}>
-                  Complete
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
-      </Box>
-    </Box>
+      {/* Render the modal when modalShow is true
+      {modalShow && (
+        <MyVerticallyCenteredModal
+          show={modalShow}
+          onHide={() => setModalShow(false)}
+          post={selectedPost} // Pass the selected post as a prop to the modal
+        />
+      )} */}
+    </div>
   );
 };
 
