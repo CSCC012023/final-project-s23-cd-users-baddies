@@ -155,7 +155,7 @@ const Login = () => {
       Location: location,
     };
 
-    await setDoc(doc(db, 'Users', auth.currentUser.uid), userData);
+    await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
     setUserType('business');
     setUser(userData);
     setNewUser(false);
