@@ -28,10 +28,36 @@ const MyPosts = () => {
   const user = useContext(UserContext);
   const [posts, setPosts] = useState([]);
   const [filteredStatus, setFilteredStatus] = useState("posted");
+  const [selectedPost, setSelectedPost] = useState(null);
+
+  const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
+  const { isOpen: isCompleteOpen, onOpen: onCompleteOpen, onClose: onCompleteClose } = useDisclosure();
+
 
   const filterPostsByStatus = (status) => {
     setFilteredStatus(status);
   };
+
+  const completePost = async (post) => {
+    try {
+      const postId = post.pid;
+      await axios.put(`http://localhost:3000/api/posts/${postId}`, {
+        status: "completed",
+      });
+      
+      // Update the post status in the local state if necessary
+      // For example, you could filter the post list and remove the completed post
+      setPosts((prevPosts) =>
+        prevPosts.map((p) => (p.pid === postId ? { ...p, status: "completed" } : p))
+      );
+      
+      setSelectedPost(null); // Reset the selectedPost state
+      onCompleteClose(); // Close the modal after successful completion
+    } catch (error) {
+      console.error('Error completing the post:', error);
+    }
+  };
+  
 
   useEffect(() => {
     const fetchUserPosts = async () => {
@@ -45,17 +71,13 @@ const MyPosts = () => {
           })
         );
         setPosts(postsWithAddresses);
-        console.log(posts)
       } catch (error) {
         console.error('Error fetching user posts:', error);
       }
     };
   
     fetchUserPosts();
-  }, [user.uid]);
-  
-   
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  }, [posts, user.uid]);
 
   return (
     <div>
@@ -104,10 +126,10 @@ const MyPosts = () => {
                     <Divider />
                     <CardFooter>
                       <ButtonGroup spacing="2" margin="10px" >
-                        <Button onClick={onOpen} variant="solid" colorScheme="blue" ml={post.status === "posted" || post.status === "completed"? "50px" : "flex-start"} >
+                        <Button onClick={onDetailsOpen} variant="solid" colorScheme="blue" ml={post.status === "posted" || post.status === "completed"? "50px" : "flex-start"} >
                           Details
                         </Button>
-                        <Modal isOpen={isOpen} onClose={onClose}>
+                        <Modal isOpen={isDetailsOpen} onClose={onDetailsClose}>
                           <ModalOverlay />
                           <ModalContent
                             position="absolute"
@@ -125,17 +147,45 @@ const MyPosts = () => {
                             </ModalBody>
 
                             <ModalFooter>
-                              <Button colorScheme='blue' mr={3} onClick={onClose}>
+                              <Button colorScheme='blue' mr={3} onClick={onDetailsClose}>
                                 Close
                               </Button>
                             </ModalFooter>
                           </ModalContent>
                         </Modal>
                         {post.status === "in-progress" && (
-                        <Button variant="solid" colorScheme="teal">
+                        <Button variant="solid" colorScheme="teal" onClick={() => {
+                          setSelectedPost(post); // Set the selectedPost before opening the modal
+                          onCompleteOpen();
+                        }}>
                           Complete
                         </Button>
+                        
                       )}
+                      <Modal isOpen={isCompleteOpen} onClose={onCompleteClose}>
+                          <ModalOverlay />
+                          <ModalContent
+                            position="absolute"
+                            top="25%"
+                            transform="translate(-50%, -50%)"
+                            maxW="80%"
+                            width="fit-content"
+                          >
+                            <ModalHeader>{selectedPost && selectedPost.title}</ModalHeader>
+                            <ModalCloseButton />
+                            <ModalBody>
+                              <Text>Are you sure?</Text>
+                            </ModalBody>
+                            <ModalFooter>
+                            <Button colorScheme='teal' mr={3} onClick={() => completePost(selectedPost)}>
+                                Complete
+                              </Button>
+                              <Button colorScheme='blue' mr={3} onClick={onCompleteClose} >
+                                Close
+                              </Button>
+                            </ModalFooter>
+                          </ModalContent>
+                        </Modal>
                       </ButtonGroup>
                     </CardFooter>
                   </Box>
@@ -144,15 +194,6 @@ const MyPosts = () => {
           </Box>
         </div>
       )}
-
-      {/* Render the modal when modalShow is true
-      {modalShow && (
-        <MyVerticallyCenteredModal
-          show={modalShow}
-          onHide={() => setModalShow(false)}
-          post={selectedPost} // Pass the selected post as a prop to the modal
-        />
-      )} */}
     </div>
   );
 };
