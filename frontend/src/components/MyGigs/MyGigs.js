@@ -43,8 +43,10 @@ const MyGigs = () => {
         const response = await axios.get(`http://localhost:3000/api/gigs/users/${user.uid}/gigs`);
         const gigsData = await Promise.all(
           response.data.map(async (gig) => {
-            console.log(gig);
-            return { ...gig };
+            // console.log(gig)
+            // console.log(post);
+            // console.log(gig.post.title);
+            return { ...gig};
           })
         );
         setGigs(gigsData);
@@ -70,10 +72,10 @@ const MyGigs = () => {
       >
         <Stack spacing={3} direction="row" align="center" display="flex">
           <Button colorScheme="teal" onClick={() => filterPostsByStatus("request-gig")}>
-            Posted
+            Request
           </Button>
           <Button colorScheme="red" onClick={() => filterPostsByStatus("requested")}>
-            In Progress
+            Requested
           </Button>
           <Button colorScheme="teal" onClick={() => filterPostsByStatus("completed")}>
             Completed
@@ -94,17 +96,17 @@ const MyGigs = () => {
                   <Box borderWidth={1} borderRadius="lg" overflow="hidden">
                     <CardBody>
                       <Stack mt="6" spacing="4">
-                        <Heading size="lg">GID: {gig.gid}</Heading>
+                        <Heading size="lg">Gig GID: {gig.gid}</Heading>
                         <Text fontSize="lg">Status: {gig.status}</Text>
                         <Text color="blue.600" fontSize="xl">
-                          Price: ${gig.status}
+                          Post ID: {gig.post._path.segments[1]}
                         </Text>
                       </Stack>
                     </CardBody>
                     <Divider />
                     <CardFooter>
-                      <ButtonGroup spacing="2" margin="10px" >
-                        <Button onClick={onOpen} variant="solid" colorScheme="blue" ml={gig.status === "posted" || gig.status === "completed" ? "50px" : "flex-start"} >
+                      {/* <ButtonGroup spacing="2" margin="10px" >
+                        <Button onClick={onOpen} variant="solid" colorScheme="blue" ml={gig.status === "requested" || gig.status === "completed" ? "50px" : "flex-start"} >
                           Details
                         </Button>
                         <Modal isOpen={isOpen} onClose={onClose}>
@@ -119,9 +121,9 @@ const MyGigs = () => {
                             <ModalHeader>{gig.title}</ModalHeader>
                             <ModalCloseButton />
                             <ModalBody>
-                              <Text>Description: {gig.description}</Text>
-                              <Text>Location: {gig.address}</Text>
-                              <Text>Price: ${gig.price}</Text>
+                              <Text>Description: {gig.post.title}</Text>
+                              <Text>GID: {gig.gid}</Text>
+                              <Text>Post: ${gig.post.title}</Text>
                             </ModalBody>
 
                             <ModalFooter>
@@ -131,12 +133,12 @@ const MyGigs = () => {
                             </ModalFooter>
                           </ModalContent>
                         </Modal>
-                        {gig.status === "in-progress" && (
+                        {gig.status === "requested" && (
                           <Button variant="solid" colorScheme="teal">
                             Complete
                           </Button>
                         )}
-                      </ButtonGroup>
+                      </ButtonGroup> */}
                     </CardFooter>
                   </Box>
                 </Card>
