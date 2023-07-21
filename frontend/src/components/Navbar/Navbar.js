@@ -43,6 +43,7 @@ export default function Navbar({ userType }) {
         </Link>
       </Flex>
       <Box>
+        <NavLink to="/notifications">Notifications</NavLink>
         {userType === "customer" && (
           <>
             <NavLink to="/discoverbusinesses">Discover</NavLink>

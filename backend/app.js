@@ -13,7 +13,7 @@ const server = http.createServer(app)
 
 const io = new Server( server, {
   cors: {
-    origin: "http://localhost:3002",
+    origin: "*",
     methods: ['GET', 'POST'],
   },
 });
@@ -26,11 +26,13 @@ const usersRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const messagesRoutes = require('./routes/messages');
 const gigsRoutes = require('./routes/gigs');
+const notificationsRoutes = require('./routes/notifications');
 app.use('/api/posts', postRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/auths', authRoutes);
 app.use('/api/messages', messagesRoutes);
 app.use('/api/gigs', gigsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 // Socket.io event handling
 io.on('connection', (socket) => {
