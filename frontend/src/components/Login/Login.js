@@ -322,81 +322,88 @@ const Login = () => {
   } else if (user && newUser) {
     if (userType === 'business') {
       
-      return (<><Progress size="md" colorScheme="teal" hasStripe value={progress} mb={10} /><Flex
-        minH={'100vh'}
-        align={'center'}
-        justify={'center'}><Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
-                  {error !== '' ? (
+      return (
+        <>
+          <Progress size="md"  hasStripe value={progress} mb={10} />
+          <Flex minH={'100vh'} align={'center'} justify={'center'}>
+            <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+            {error !== '' ? (
   <Alert status='error'>
     <AlertIcon />
     {error}
   </Alert>
-) : null}<Heading color="teal.400">Business Information</Heading><FormControl mt="3%">
-          <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-            Business Name
-          </Text>
-          <InputGroup>
-            <Input
-              placeholder="Business Name"
-              onChange={(e) => setBusinessName(e.target.value)} />
-          </InputGroup>
-        </FormControl><FormControl mt="3%">
-            <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-              Business Description
-            </Text>
-            <InputGroup>
-              <Input
-                placeholder="Business Description"
-                onChange={(e) => setBusinessDescription(e.target.value)} />
-            </InputGroup>
-          </FormControl><FormControl mt="3%">
-            <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-              Business Hours
-            </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-              {Object.keys(businessHours).map((day) => (
-                <GridItem key={day}>
-                  <Flex flexDirection="column">
-                    <Text>{day}</Text>
-                    <Flex flexDirection="row" justifyContent="space-between">
-                      <Select placeholder="Open" onChange={(e) => setBusinessHours((prevHours) => ({
-                        ...prevHours,
-                        [day]: { ...prevHours[day], startHour: e.target.value },
-                      }))}>
-                        {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
-                          <option key={hour} value={hour}>
-                            {(hour < 10 ? '0' : '') + hour}:00
-                          </option>
-                        ))}
-                      </Select>
-                      <Select placeholder="Close" onChange={(e) => setBusinessHours((prevHours) => ({
-                        ...prevHours,
-                        [day]: { ...prevHours[day], endHour: e.target.value },
-                      }))}>
-                        {Array.from({ length: 24 }, (_, i) => i + 1).map((hour) => (
-                          <option key={hour} value={hour}>
-                            {(hour < 10 ? '0' : '') + hour}:00
-                          </option>
-                        ))}
-                      </Select>
-                    </Flex>
-                  </Flex>
-                </GridItem>
-              ))}
-            </Grid>
-          </FormControl><Button
-            borderRadius={0}
-            type="submit"
-            onClick={() => handleBusinessFormSubmit()}
-          >
-            Submit
-          </Button><Button
-            borderRadius={0}
-            type="submit"
-            onClick={() => { setUserType(''); setProgress(25); } }
-          >
-            Back
-          </Button></Stack></Flex></>);
+) : null}
+              <Heading>Create a Business Account</Heading>
+              <FormControl id="name" isRequired>
+                <FormLabel>Business Name</FormLabel>
+                <Input type="text" onChange={(e) => setBusinessName(e.target.value)} />
+              </FormControl>
+              <FormControl id="description" isRequired>
+                <FormLabel>Business Description</FormLabel>
+                <Input type="text" onChange={(e) => setBusinessDescription(e.target.value)} />
+              </FormControl>
+              <FormControl id="hours" isRequired>
+                <FormLabel>Business Hours</FormLabel>
+                <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                  {Object.keys(businessHours).map((day) => (
+                    <GridItem key={day}>
+                      <Flex flexDirection="column">
+                        <Text>{day}</Text>
+                        <Flex flexDirection="row" justifyContent="space-between">
+                          <Select placeholder="Open" onChange={(e) => setBusinessHours((prevHours) => ({
+                            ...prevHours,
+                            [day]: { ...prevHours[day], startHour: e.target.value },
+                          }))}>
+                            {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                              <option key={hour} value={hour}>
+                                {(hour < 10 ? '0' : '') + hour}:00
+                              </option>
+                            ))}
+                          </Select>
+                          <Select placeholder="Close" onChange={(e) => setBusinessHours((prevHours) => ({
+                            ...prevHours,
+                            [day]: { ...prevHours[day], endHour: e.target.value },
+                          }))}>
+                            {Array.from({ length: 24 }, (_, i) => i + 1).map((hour) => (
+                              <option key={hour} value={hour}>
+                                {(hour < 10 ? '0' : '') + hour}:00
+                              </option>
+                            ))}
+                          </Select>
+                        </Flex>
+                      </Flex>
+                    </GridItem>
+                  ))}
+                </Grid>
+              </FormControl>
+              <Button
+                type='submit'
+                onClick={() => handleBusinessFormSubmit()}
+                bg={'blue.400'}
+                color={'white'}
+                _hover={{
+                  bg: 'blue.500',
+                }}
+              >
+                Create Account
+              </Button>
+              <Button
+                onClick={() => {
+                  setUserType('');
+                  setProgress(25);
+                }}
+                bg={'blue.600'}
+                color={'white'}
+                _hover={{
+                  bg: 'blue.500',
+                }}
+              >
+                Back
+              </Button>
+            </Stack>
+          </Flex>
+        </>
+      );
     }
     if (userType === 'customer'){
       return ( <><Progress size="md" colorScheme="teal" hasStripe value={progress} mb={10} />     <Flex minH={'100vh'} align={'center'} justify={'center'}>
