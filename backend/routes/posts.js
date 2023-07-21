@@ -53,7 +53,18 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Define more routes as needed
+// Route to update a post
+router.put('/:pid', async (req, res) => {
+  const { pid } = req.params;
+  const updatedFields = req.body;
+
+  try {
+    const result = await postsController.updatePost(pid, updatedFields);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;
 

@@ -59,5 +59,26 @@ const getAllPosts = async () => {
   }
 };
 
-module.exports = { getUserPosts, createPost, getAllPosts };
+const updatePost = async (pid, updatedFields) => {
+  try {
+    const postRef = db.collection('Posts').doc(pid);
+    const postSnapshot = await postRef.get();
+
+    if (!postSnapshot.exists) {
+      throw new Error('Post not found');
+    }
+
+    const existingPostData = postSnapshot.data();
+    const updatedPostData = { ...existingPostData, ...updatedFields };
+
+    await postRef.update(updatedPostData);
+
+    return { message: 'Post updated successfully' };
+  } catch (error) {
+    console.error('Error updating post:', error);
+    throw new Error('Internal server error');
+  }
+};
+
+module.exports = { getUserPosts, createPost, getAllPosts, updatePost };
 
