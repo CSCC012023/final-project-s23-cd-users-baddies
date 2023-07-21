@@ -1,18 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getMessagesBetweenUsers, sendMessage, getChatContacts } = require('../controllers/messagesController');
-
-// Route to get all messages between two users
-router.get('/:user1Id/:user2Id', async (req, res) => {
-  try {
-    const { user1Id, user2Id } = req.params;
-    const messages = await getMessagesBetweenUsers(user1Id, user2Id);
-    res.json(messages);
-  } catch (error) {
-    console.error('Error getting messages:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-});
+const { getMessagesBetweenUsers, sendMessage, getChatContacts, getUserData } = require('../controllers/messagesController');
 
 // Route to send a message from one user to another
 router.post('/:senderId/:receiverId', async (req, res) => {
@@ -40,5 +28,17 @@ router.get('/contacts/:userId', async (req, res) => {
   }
 });
 
+// Route to get all messages between two users
+router.get('/:user1Id/:user2Id', async (req, res) => {
+  try {
+    const { user1Id, user2Id } = req.params;
+    const messages = await getMessagesBetweenUsers(user1Id, user2Id);
+    
+    res.json(messages);
+  } catch (error) {
+    console.error('Error getting messages:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 module.exports = router;
 
