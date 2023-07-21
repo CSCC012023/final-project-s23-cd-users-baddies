@@ -25,15 +25,16 @@ import {
   Stack,
   Image,
   Box,
-  Link,
+  SimpleGrid,
+  Progress,
   FormControl,
   InputRightElement,
-  HStack,
+  CardFooter,
   FormLabel,
   Text,
-  Select,
-  Grid,
-  GridItem,Center, Alert, AlertIcon} from '@chakra-ui/react';
+  Card,
+  CardHeader,
+  CardBody,Center, Alert, AlertIcon, Grid, GridItem, Select} from '@chakra-ui/react';
   import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 const firebaseConfig = {
   apiKey: 'AIzaSyB-vRFrtFhIbXw2NHMj8VfBvi2iMU4kxwE',
@@ -50,8 +51,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const Login = () => {
-  
-  const [showBusinessForm, setShowBusinessForm] = useState(false);
+  const [progress, setProgress] = useState(25);
   const [user, setUser] = useState(null);
   const [signup, setSignup] = useState(false);
   const [userType, setUserType] = useState(null);
@@ -60,6 +60,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState('');
+  const [customerName, setCustomerName] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [location, setLocation] = useState('');
@@ -164,39 +165,38 @@ const Login = () => {
 
   };
 
-  const handleUserType = async (type) => {
-    if (!phoneNumber || !location) {
-      console.log('Please input your phone number and select a location');
-      return;
-    }
+  // const handleUserType = async (type) => {
+  //   if (!phoneNumber || !location) {
+  //     console.log('Please input your phone number and select a location');
+  //     return;
+  //   }
 
-    const userData = {
-      uid: auth.currentUser.uid,
-      userType: type,
-      Name: auth.currentUser.displayName,
-      contactNumber: phoneNumber,
-      postalCode: postalCode,
-      Rating: 5,
-      Location: location,
-    };
+  //   const userData = {
+  //     uid: auth.currentUser.uid,
+  //     userType: type,
+  //     Name: auth.currentUser.displayName,
+  //     contactNumber: phoneNumber,
+  //     postalCode: postalCode,
+  //     Rating: 5,
+  //     Location: location,
+  //   };
 
-    if (type === 'business') {
-      console.log("hi");
-      setShowBusinessForm(true);
-    } else {
-      await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
-      setUserType(type);
-      setUser(userData);
-      setNewUser(false);
-    }
-  };
+  //   if (type === 'business') {
+  //     console.log("hi");
+  //     setShowBusinessForm(true);
+  //   } else {
+  //     await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
+  //     setUser(userData);
+  //     setNewUser(false);
+  //   }
+  // };
 
   const handleBusinessFormSubmit = async () => {
     if (!businessName || !businessDescription || Object.keys(businessHours).length === 0) {
-      console.log('Please fill in all the required information');
+      setError('Please fill in all the required information');
       return;
     }
-
+    setError('');
     const userData = {
       uid: auth.currentUser.uid,
       userType: 'business',
@@ -213,7 +213,28 @@ const Login = () => {
     };
 
     await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
-    setUserType('business');
+    
+    setUser(userData);
+    setNewUser(false);
+  };
+  const handleCustomerFormSubmit = async () => {
+    if (!customerName || !location || Object.keys(businessHours).length === 0) {
+      setError('Please fill in all the required information');
+      return;
+    }
+    setError('');
+    const userData = {
+      uid: auth.currentUser.uid,
+      userType: 'customer',
+      Name: customerName,
+      contactNumber: phoneNumber,
+      postalCode: postalCode,
+      Rating: 5,
+      Location: location,
+    };
+
+    await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
+    
     setUser(userData);
     setNewUser(false);
   };
@@ -299,166 +320,182 @@ const Login = () => {
       </UserContext.Provider>
     );
   } else if (user && newUser) {
-    return (
-      <Flex
-        flexDirection="column"
-        width="100%"
-        height="100%"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Stack
-          flexDir="column"
-          mb="2"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Image src="./bizreach-logo.png" alt="BizReach Logo" htmlWidth="200px" />
-          <Heading color="teal.400">Create your account!</Heading>
-          <Stack p="1rem" boxShadow="md">
-          <FormControl>
-  <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-    Phone Number
-  </Text>
-  <InputGroup>
-    <Input
-      placeholder="Phone Number"
-      onChange={(e) => setPhoneNumber(e.target.value)}
-    />
-  </InputGroup>
-</FormControl>
-<FormControl>
-  <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-    Location
-  </Text>
-  <Select placeholder="Select location" onChange={(e) => setLocation(e.target.value)}>
+    if (userType === 'business') {
+      
+      return (<><Progress size="md" colorScheme="teal" hasStripe value={progress} mb={10} /><Flex
+        minH={'100vh'}
+        align={'center'}
+        justify={'center'}><Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+                  {error !== '' ? (
+  <Alert status='error'>
+    <AlertIcon />
+    {error}
+  </Alert>
+) : null}<Heading color="teal.400">Business Information</Heading><FormControl mt="3%">
+          <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
+            Business Name
+          </Text>
+          <InputGroup>
+            <Input
+              placeholder="Business Name"
+              onChange={(e) => setBusinessName(e.target.value)} />
+          </InputGroup>
+        </FormControl><FormControl mt="3%">
+            <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
+              Business Description
+            </Text>
+            <InputGroup>
+              <Input
+                placeholder="Business Description"
+                onChange={(e) => setBusinessDescription(e.target.value)} />
+            </InputGroup>
+          </FormControl><FormControl mt="3%">
+            <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
+              Business Hours
+            </Text>
+            <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+              {Object.keys(businessHours).map((day) => (
+                <GridItem key={day}>
+                  <Flex flexDirection="column">
+                    <Text>{day}</Text>
+                    <Flex flexDirection="row" justifyContent="space-between">
+                      <Select placeholder="Open" onChange={(e) => setBusinessHours((prevHours) => ({
+                        ...prevHours,
+                        [day]: { ...prevHours[day], startHour: e.target.value },
+                      }))}>
+                        {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                          <option key={hour} value={hour}>
+                            {(hour < 10 ? '0' : '') + hour}:00
+                          </option>
+                        ))}
+                      </Select>
+                      <Select placeholder="Close" onChange={(e) => setBusinessHours((prevHours) => ({
+                        ...prevHours,
+                        [day]: { ...prevHours[day], endHour: e.target.value },
+                      }))}>
+                        {Array.from({ length: 24 }, (_, i) => i + 1).map((hour) => (
+                          <option key={hour} value={hour}>
+                            {(hour < 10 ? '0' : '') + hour}:00
+                          </option>
+                        ))}
+                      </Select>
+                    </Flex>
+                  </Flex>
+                </GridItem>
+              ))}
+            </Grid>
+          </FormControl><Button
+            borderRadius={0}
+            type="submit"
+            onClick={() => handleBusinessFormSubmit()}
+          >
+            Submit
+          </Button><Button
+            borderRadius={0}
+            type="submit"
+            onClick={() => { setUserType(''); setProgress(25); } }
+          >
+            Back
+          </Button></Stack></Flex></>);
+    }
+    if (userType === 'customer'){
+      return ( <><Progress size="md" colorScheme="teal" hasStripe value={progress} mb={10} />     <Flex minH={'100vh'} align={'center'} justify={'center'}>
+        <Stack spacing={8} mx={'auto'} maxW={'lg'} py={12} px={6}>
+        {error !== '' ? (
+  <Alert status='error'>
+    <AlertIcon />
+    {error}
+  </Alert>
+) : null}
+        <Heading>Create a Customer Account</Heading>
+        <FormControl id="name" isRequired>
+          <FormLabel>Full Name</FormLabel>
+          <Input type="text" onChange={(e) => setCustomerName(e.target.value)} />
+        </FormControl>
+        <FormControl id="phone" isRequired>
+          <FormLabel>Phone Number</FormLabel>
+          <Input type="text" onChange={(e) => setPhoneNumber(e.target.value)} />
+        </FormControl>
+        <FormControl id="postalCode" isRequired>
+          <FormLabel>Postal Code</FormLabel>
+          <Input type="text" onChange={(e) => setPostalCode(e.target.value)} />
+        </FormControl>
+          <FormControl id="location" isRequired>
+          <FormLabel>Location</FormLabel>
+        <Select placeholder="Select location" onChange={(e) => setLocation(e.target.value)}>
     {locations.map((location) => (
       <option key={location} value={location}>
         {location}
       </option>
     ))}
   </Select>
-</FormControl>
 
-            <Heading color="teal.400" mt="10%">
-              Please select your user type
-            </Heading>
-
-            <Button
-              borderRadius={0}
-              type="submit"
-              variant="solid"
-              colorScheme="teal"
-              align="right"
-              mt="5%"
-              onClick={() => handleUserType('business')}
-            >
-              I am a Business
-            </Button>
-
-            <Button
-              borderRadius={0}
-              type="submit"
-              variant="solid"
-              colorScheme="teal"
-              mt="5%"
-              onClick={() => handleUserType('customer')}
-            >
-              I am a Customer
-            </Button>
-            <Button
-  borderRadius={0}
-  type="submit"
-  variant="solid"
-  colorScheme="teal"
-  width="full"
-  onClick={() => auth.signOut()}
->
-  Sign Out
-</Button>
-            {showBusinessForm && (
-              <Box mt="5%">
-                <Heading color="teal.400">Business Information</Heading>
-                <FormControl mt="3%">
-                  <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-                    Business Name
-                  </Text>
-                  <InputGroup>
-                    <Input
-                      placeholder="Business Name"
-                      onChange={(e) => setBusinessName(e.target.value)}
-                    />
-                  </InputGroup>
-                </FormControl>
-
-                <FormControl mt="3%">
-                  <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-                    Business Description
-                  </Text>
-                  <InputGroup>
-                    <Input
-                      placeholder="Business Description"
-                      onChange={(e) => setBusinessDescription(e.target.value)}
-                    />
-                  </InputGroup>
-                </FormControl>
-
-                <FormControl mt="3%">
-                  <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-                    Business Hours
-                  </Text>
-                  <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                  {showBusinessForm && Object.keys(businessHours).map((day) => (
-  <GridItem key={day}>
-    <Flex flexDirection="column">
-      <Text>{day}</Text>
-      <Flex flexDirection="row" justifyContent="space-between">
-        <Select placeholder="Start Hour" onChange={(e) => 
-          setBusinessHours((prevHours) => ({
-            ...prevHours,
-            [day]: { ...prevHours[day], startHour: e.target.value },
-          }))}>
-          {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
-            <option key={hour} value={hour}>
-              {(hour < 10 ? '0' : '') + hour}:00
-            </option>
-          ))}
-        </Select>
-        <Select placeholder="End Hour" onChange={(e) =>
-          setBusinessHours((prevHours) => ({
-            ...prevHours,
-            [day]: { ...prevHours[day], endHour: e.target.value },
-          }))}>
-          {Array.from({ length: 24 }, (_, i) => i+1).map((hour) => (
-            <option key={hour} value={hour}>
-              {(hour < 10 ? '0' : '') + hour}:00
-            </option>
-          ))}
-        </Select>
-      </Flex>
-    </Flex>
-  </GridItem>
-))}
-                  </Grid>
-                </FormControl>
-
-                <Button
-                  borderRadius={0}
-                  type="submit"
-                  variant="solid"
-                  colorScheme="teal"
-                  mt="5%"
-                  onClick={() => handleBusinessFormSubmit()}
-                >
-                  Submit
-                </Button>
-              </Box>
-            )}
-          </Stack>
+          </FormControl>
+          <Button
+              type='submit'
+            onClick={() => handleCustomerFormSubmit()}
+            bg={'blue.400'}
+            color={'white'}
+            _hover={{
+              bg: 'blue.500',
+            }}
+          >
+            Create Account
+          </Button>
+          <Button
+            onClick={() => {
+              setUserType('');
+              setProgress(25);
+            }}
+            bg={'blue.600'}
+            color={'white'}
+            _hover={{
+              bg: 'blue.500',
+            }}
+          >
+            Back
+          </Button>
         </Stack>
-      </Flex>
+    </Flex></>);
+      }
+    return (
+      <>
+       <Progress size="md" colorScheme="teal" hasStripe value={progress} mb={10} />
+       <Flex
+    minH={'100vh'}
+    align={'center'}
+    justify={'center'}>
+          <Box width="auto">
+           
+            <SimpleGrid spacing={4} >
+              <Card>
+                <CardHeader>
+                  <Heading size='md'> Business Account Creation</Heading>
+                </CardHeader>
+                <CardBody>
+                  <Text>Create a business account to accept gigs from customers and manage your services effectively.</Text>
+                </CardBody>
+                <CardFooter>
+                  <Button onClick={() => { setUserType('business'); setProgress(75); }}>Create Account</Button>
+                </CardFooter>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <Heading size='md'> Customer Account Creation </Heading>
+                </CardHeader>
+                <CardBody>
+                  <Text>Sign up as a customer to explore available services, hire businesses, and post gigs requirements.</Text>
+                </CardBody>
+                <CardFooter>
+                  <Button onClick={()=> {setUserType('customer'); setProgress(75);}} >Sign Up</Button>
+                </CardFooter>
+              </Card>
+            </SimpleGrid>
+          </Box>
+        </Flex>
+      </>
     );
-  }
+    }
 
   return (<Flex
     minH={'100vh'}
