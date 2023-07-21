@@ -14,6 +14,23 @@ router.get('/users/:uid/posts', async (req, res) => {
   }
 });
 
+// Route to update a post's status
+router.put('/users/:uid/posts/:pid', async (req, res) => {
+
+  const { uid, pid } = req.params;
+  const { status } = req.body;
+
+  try {
+    // Call the postsController to update the post's status
+    const updatedPost = await postsController.updatePostStatus(uid, pid, status);
+
+    res.status(200).json(updatedPost);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 // Route to create a new post for a user
 router.post('/users/:uid/posts', async (req, res) => {
   const { uid } = req.params;
@@ -53,7 +70,18 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Define more routes as needed
+// Route to update a post
+router.put('/:pid', async (req, res) => {
+  const { pid } = req.params;
+  const updatedFields = req.body;
+
+  try {
+    const result = await postsController.updatePost(pid, updatedFields);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;
 
