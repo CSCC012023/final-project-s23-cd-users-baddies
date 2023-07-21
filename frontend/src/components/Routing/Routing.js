@@ -10,6 +10,7 @@ import MyPosts from "../MyPosts/MyPosts";
 import MyBusiness from "../MyBusiness/MyBusiness";
 import BusniessRegistration from "../Login/BusinessRegistration";
 import Messages from "../Messages/Messages"
+import Notifications from "../Notifications/Notifications";
 export default function Routing({ user, userType }) {
     return (
         <div>
@@ -26,6 +27,7 @@ export default function Routing({ user, userType }) {
                     <Route path="/mybusiness" element={<MyBusiness />} />
                     <Route path="/messages" element={<Messages />} />
                     <Route path="/businessregistration" element={<BusniessRegistration />} />
+                    <Route path="/notifications" element={<Notifications />} />
                 </Routes>
             </div>
         </div>

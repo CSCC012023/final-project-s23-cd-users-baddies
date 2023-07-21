@@ -13,30 +13,29 @@ const fetchPosts = async () => {
   }
 };
 
-const applyForGig = async (post) => {
-  try {
-    const response = await fetch('http://localhost:3000/api/gigs', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        postId: post.pid,
-        businessId: 'YOUR_BUSINESS_ID' // Replace with the ID of the business applying for the gig
-      })
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      return result.message;
-    } else {
-      throw new Error('Failed to apply for the gig');
+const applyForGig = async (selectedPost, userId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/gigs/users/${userId}/gigs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          pid: selectedPost.pid,
+        }),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        return result.message;
+      } else {
+        throw new Error('Failed to apply for the gig');
+      }
+    } catch (error) {
+      console.error('Error applying for the gig:', error);
+      throw new Error('Error applying for the gig');
     }
-  } catch (error) {
-    console.error('Error applying for the gig:', error);
-    throw new Error('Error applying for the gig');
-  }
-};
+  };
 
 const listenForNewPosts = (onNewPostReceived) => {
   socket.on('newPost', (post) => {
@@ -48,5 +47,30 @@ const listenForNewPosts = (onNewPostReceived) => {
   });
 };
 
-export { fetchPosts, applyForGig, listenForNewPosts };
+const createNotification = async (receiverId, senderId, text, type) => {
+    console.log('receiverId:', receiverId);
+    console.log('senderId:', senderId);
+  
+    try {
+      const response = await fetch('http://localhost:3000/api/notifications/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ receiverId, senderId, text, type }),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        return result;
+      } else {
+        throw new Error('Failed to create the notification');
+      }
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw new Error('Error creating notification');
+    }
+  };
+  
+export { fetchPosts, applyForGig, listenForNewPosts, createNotification };
 

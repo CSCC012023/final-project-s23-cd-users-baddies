@@ -1,20 +1,46 @@
 import React, { Component } from 'react';
-import { Map, InfoWindow, Marker, GoogleApiWrapper } from 'google-maps-react';
+import { Map, Marker, GoogleApiWrapper } from 'google-maps-react';
 import { UserContext } from '../../User/UserContext';
-import { fetchPosts, applyForGig, listenForNewPosts } from './googleMapService';
-import '../../../firebase/firebase'
-import './MapInfoWindow';
-import './MapMarker'
+import { fetchPosts, applyForGig, listenForNewPosts, createNotification } from './googleMapService';
+import '../../../firebase/firebase';
+import { Box, Heading, Text, Button } from '@chakra-ui/react';
 
 const style = {
   width: '75%',
   height: '60%',
-  overflowX: 'hidden'
+  overflowX: 'hidden',
 };
 const containerStyle = {
   width: '70vw',
   height: '100vh',
-  overflowX: 'hidden'
+  overflowX: 'hidden',
+};
+
+const SelectedPostInfo = ({ selectedPost, onGrabGig }) => {
+  return (
+    <Box p={4} bg="gray.900" boxShadow="md" borderRadius="md">
+      {!selectedPost ? (
+        <Text>Select a post on the map</Text>
+      ) : (
+        <Box>
+          <Heading as="h2" size="lg" mb={2}>
+            {selectedPost.title}
+          </Heading>
+          <Text>Price: {selectedPost.price}</Text>
+          <Text>Description: {selectedPost.description}</Text>
+          <Text>
+            Location: {selectedPost.location.lat}, {selectedPost.location.lon}
+          </Text>
+          {/* Button to grab the gig */}
+          {!selectedPost.isButtonClicked && (
+            <Button colorScheme="teal" mt={4} onClick={() => onGrabGig(selectedPost)}>
+              Grab Gig
+            </Button>
+          )}
+        </Box>
+      )}
+    </Box>
+  );
 };
 
 export class GoogleMapContainer extends Component {
@@ -25,8 +51,6 @@ export class GoogleMapContainer extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      showingInfoWindow: false,
-      activeMarker: {},
       selectedPost: null,
       posts: [],
       notification: null,
@@ -39,7 +63,9 @@ export class GoogleMapContainer extends Component {
     // Fetch all posts from the backend
     fetchPosts()
       .then((posts) => {
-        this.setState({ posts: posts });
+        // Set the initial isButtonClicked property for each post to false
+        const postsWithButtonState = posts.map((post) => ({ ...post, isButtonClicked: false }));
+        this.setState({ posts: postsWithButtonState });
       })
       .catch((error) => {
         console.error('Error fetching posts:', error);
@@ -49,7 +75,7 @@ export class GoogleMapContainer extends Component {
     listenForNewPosts((post) => {
       // Update the map with the new post
       this.setState((prevState) => ({
-        posts: [...prevState.posts, post], // Add the new post to the existing posts array
+        posts: [...prevState.posts, { ...post, isButtonClicked: false }], // Add the new post to the existing posts array with initial isButtonClicked state
         notification: 'New post created!', // Show a notification for the new post
       }));
 
@@ -62,67 +88,71 @@ export class GoogleMapContainer extends Component {
     this._isMounted = false;
   }
 
-  onMarkerClick = (props, marker, e) => {
-    this.setState({
-      notification: null,
-      selectedPost: props.post,
-      activeMarker: marker,
-      showingInfoWindow: true
-    });
-  }
+  handlePostTransfer = (selectedPost) => {
+    console.log('Gig-request notification created successfully');
 
-  onMapClicked = () => {
-    if (this.state.showingInfoWindow) {
+    const user = this.context;
+  
+    // Check if a post is selected before applying for the gig
+    if (!selectedPost) {
+      console.error('No post selected');
       this.setState({
-        showingInfoWindow: false,
-        activeMarker: null
+        notification: 'Please select a post before applying for the gig',
       });
+      return;
     }
-  };
-
-  handlePostTransfer = () => {
-    const { selectedPost } = this.state;
-    // Implement your logic to apply for the gig here
-    // You may make a POST request to your backend API to apply for the gig
-    // and handle the response accordingly
-    applyForGig(selectedPost)
+  
+    applyForGig(selectedPost, user.uid)
       .then((message) => {
         console.log(message);
         this.setState({
-          notification: 'Gig applied successfully'
+          notification: 'Gig applied successfully',
         });
+  
+        // Create a gig-request notification after successfully applying for the gig
+        const senderId = user.uid; // Use the logged-in user's ID
+        const receiverId = "cFueY8SVyGMngbmnMPdCDQjZOff2"; // Assuming postedBy is an object containing the user ID
+        console.log(senderId, receiverId)
+  
+        // Notification text
+        const notificationText = `${senderId} has applied for your gig: ${selectedPost.title}`;
+  
+        // Type of the notification
+        const notificationType = 'gig-request';
+  
+        // Create the gig-request notification
+        createNotification(receiverId, senderId, notificationText, notificationType)
+          .then(() => {
+            console.log('Gig-request notification created successfully');
+          })
+          .catch((error) => {
+            console.error('Error creating gig-request notification:', error);
+          });
+  
+        // Update the isButtonClicked state for the selected post
+        this.setState((prevState) => ({
+          posts: prevState.posts.map((post) =>
+            post.pid === selectedPost.pid ? { ...post, isButtonClicked: true } : post
+          ),
+        }));
       })
       .catch((error) => {
         console.error('Error applying for the gig:', error);
         this.setState({
-          notification: 'An error occurred while applying for the gig'
+          notification: 'An error occurred while applying for the gig',
         });
       });
-  }
-
-  infoWindowContent = () => {
-    const { selectedPost } = this.state;
-    return (
-      <div style={{ color: 'black' }}>
-        <h2>{selectedPost?.title}</h2>
-        <p>Price: {selectedPost?.price}</p>
-        <p>Description: {selectedPost?.description}</p>
-        <p>Location: {selectedPost?.location.lat}, {selectedPost?.location.lon}</p>
-        {this.context.userType === 'business' && (
-          <button id='logPostButton' onClick={this.handlePostTransfer}>Grab Gig</button>
-        )}
-      </div>
-    );
-  }
+  };
 
   render() {
+    const { selectedPost } = this.state;
+
     return (
       <div>
-        {this.state.notification &&
-          <div className="notification">
-            {this.state.notification}
-          </div>
-        }
+        {this.state.notification && <div className="notification">{this.state.notification}</div>}
+        {/* Display the SelectedPostInfo component above the map */}
+        <SelectedPostInfo selectedPost={selectedPost} onGrabGig={this.handlePostTransfer} />
+
         <Map
           containerStyle={containerStyle}
           resetBoundsOnResize={true}
@@ -132,24 +162,18 @@ export class GoogleMapContainer extends Component {
           zoom={10}
           initialCenter={{
             lat: 43.653225,
-            lng: -79.383186
+            lng: -79.383186,
           }}
         >
           {this.state.posts.map((post, index) => (
             <Marker
               key={index}
-              onClick={this.onMarkerClick}
               name={post.title}
               post={post}
               position={{ lat: post.location.lat, lng: post.location.lon }}
+              onClick={() => this.setState({ selectedPost: post })}
             />
           ))}
-          <InfoWindow
-            marker={this.state.activeMarker}
-            visible={this.state.showingInfoWindow}
-          >
-            {this.infoWindowContent()}
-          </InfoWindow>
         </Map>
       </div>
     );
@@ -159,3 +183,6 @@ export class GoogleMapContainer extends Component {
 export default GoogleApiWrapper({
   apiKey: ('AIzaSyCslCplJhzh8rKxQ0c6xZSv7UlILmWUiys')
 })(GoogleMapContainer)
+
+
+
