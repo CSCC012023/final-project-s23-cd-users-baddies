@@ -74,4 +74,32 @@ const updateUserProfile = async (userId, updateFields) => {
   }
 };
 
-module.exports = { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers };
+// usersController.js
+
+// ...
+
+// Get services for a specific user
+const getUserServices = async (userId) => {
+  try {
+    const userRef = db.collection('User').doc(userId).collection('Services');
+    const servicesSnapshot = await userRef.get();
+    const services = [];
+    servicesSnapshot.forEach((doc) => {
+      const service = doc.data();
+      services.push(service);
+    });
+
+    return services;
+  } catch (error) {
+    console.error('Error getting user services:', error);
+    throw new Error('Internal server error');
+  }
+};
+
+module.exports = { 
+  getAllUsers,
+  getUserProfile,
+  updateUserProfile,
+  getBusinessUsers,
+  getUserServices
+};

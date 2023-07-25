@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers } = require('../controllers/usersController');
+const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices } = require('../controllers/usersController');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -23,6 +23,17 @@ router.get('/businesses', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+
+router.get('/services/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userServices = await getUserServices(userId);
+    res.json(userServices);
+  } catch (error) {
+    console.error('Error getting user services:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
   
 
 // Get user profile
