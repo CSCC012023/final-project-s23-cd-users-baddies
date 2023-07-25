@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices } = require('../controllers/usersController');
+const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices, addBusinessUserService } = require('../controllers/usersController');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -31,6 +31,32 @@ router.get('/services/:userId', async (req, res) => {
     res.json(userServices);
   } catch (error) {
     console.error('Error getting user services:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.post('/services/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { serviceName, description, price, duration } = req.body;
+    
+    // Check if the required fields are provided
+    if (!serviceName || !description || !price || !duration) {
+      return res.status(400).json({ error: 'Service name, description, price and duration are required' });
+    }
+
+    const newService = {
+      serviceName,
+      description,
+      price,
+      duration
+    };
+
+    await addBusinessUserService(userId, newService);
+
+    res.json({ message: 'Service added successfully' });
+  } catch (error) {
+    console.error('Error adding user service:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

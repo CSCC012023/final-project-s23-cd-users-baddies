@@ -96,10 +96,33 @@ const getUserServices = async (userId) => {
   }
 };
 
+// Add a service for a user
+const addBusinessUserService = async (userId, newService) => {
+  try {
+    // Get the user document reference
+    const userRef = db.collection('User').doc(userId);
+
+    // Check if the user exists
+    const userDoc = await userRef.get();
+    if (!userDoc.exists) {
+      throw new Error('User not found');
+    }
+
+    // Create a new service document under the "Services" subcollection of the user
+    const servicesCollectionRef = userRef.collection('Services');
+    await servicesCollectionRef.add(newService);
+  } catch (error) {
+    console.error('Error adding user service:', error);
+    throw error; 
+  }
+};
+
+
 module.exports = { 
   getAllUsers,
   getUserProfile,
   updateUserProfile,
   getBusinessUsers,
-  getUserServices
+  getUserServices,
+  addBusinessUserService
 };
