@@ -108,15 +108,40 @@ const addBusinessUserService = async (userId, newService) => {
       throw new Error('User not found');
     }
 
-    // Create a new service document under the "Services" subcollection of the user
+    // Add the service document to the "Services" subcollection and let Firestore generate the document ID
     const servicesCollectionRef = userRef.collection('Services');
-    await servicesCollectionRef.add(newService);
+    const serviceDocRef = await servicesCollectionRef.add(newService);
+
+    // Get the generated service ID and update the service document with it
+    const serviceId = serviceDocRef.id;
+    await serviceDocRef.update({ serviceId });
+
   } catch (error) {
     console.error('Error adding user service:', error);
-    throw error; 
+    throw error; // Re-throw the error to be handled in the route
   }
 };
 
+// Update a service
+const editUserService = async (userId, serviceId, updatedService) => {
+  try {
+    // Get the service document reference
+    const serviceRef = db.collection('User').doc(userId).collection('Services').doc(serviceId);
+
+    // Check if the service exists
+    const serviceDoc = await serviceRef.get();
+    if (!serviceDoc.exists) {
+      throw new Error('Service not found');
+    }
+
+    // Update the service document with the provided updatedService fields
+    await serviceRef.update(updatedService);
+
+  } catch (error) {
+    console.error('Error updating user service:', error);
+    throw error; // Re-throw the error to be handled in the route
+  }
+};
 
 module.exports = { 
   getAllUsers,
@@ -124,5 +149,6 @@ module.exports = {
   updateUserProfile,
   getBusinessUsers,
   getUserServices,
-  addBusinessUserService
+  addBusinessUserService,
+  editUserService
 };
