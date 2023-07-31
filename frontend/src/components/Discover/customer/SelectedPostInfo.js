@@ -4,7 +4,7 @@ import { Box, Heading, Text, Button } from '@chakra-ui/react';
 
 const SelectedPostInfo = ({ selectedPost }) => {
   return (
-    <Box p={4} bg="gray.900" boxShadow="md" borderRadius="md">
+    <Box p={4} bg="white" boxShadow="md" borderRadius="md">
       {!selectedPost ? (
         <Text>Select a post on the map</Text>
       ) : (
