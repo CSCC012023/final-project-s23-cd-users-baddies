@@ -11,7 +11,7 @@ function App() {
   return (
     <div>
 <ChakraProvider>
-<div className="App">
+  <div className="App">
       <header className="App-header">
         <Login />
       </header>

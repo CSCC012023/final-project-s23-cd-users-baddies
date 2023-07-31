@@ -39,7 +39,6 @@ const Post = () => {
       const geocodeResponse = await fetch(geocodeUrl);
       const geocodeData = await geocodeResponse.json();
 
-
       if (geocodeData && geocodeData.length > 0) {
         const { lat, lon } = geocodeData[0];
 
@@ -52,9 +51,11 @@ const Post = () => {
           body: JSON.stringify({
             title,
             description,
-            price,
+            price: parseFloat(price), // Convert to a number
             location: { lat, lon },
             postalCode,
+            status: 'posted',
+            postedBy: `/User/${user.uid}`, // Reference to the user who created the post
           })
         });
         
@@ -180,5 +181,6 @@ const Post = () => {
 };
 
 export default Post;
+
 
 
