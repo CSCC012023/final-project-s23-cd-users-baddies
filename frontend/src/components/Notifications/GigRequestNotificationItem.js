@@ -24,7 +24,7 @@ const GigRequestNotificationItem = ({ notification, onMessageButtonClick, onAcce
       borderRadius="md"
       p={3}
       mb={2}
-      bg="gray.900"
+      bg="gray.200"
     >
       <Flex justify="space-between" mb={2}>
         <Text fontWeight="bold">{notification.text}</Text>
