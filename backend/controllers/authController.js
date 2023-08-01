@@ -1,5 +1,4 @@
 const { auth, admin, firestore } = require('../firebase');
-
 // Function for Google sign-in
 const signInWithGoogle = async (req, res) => {
     try {
