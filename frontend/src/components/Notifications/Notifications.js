@@ -14,36 +14,33 @@ const Notifications = () => {
 
   const bg = useColorModeValue("gray.100", "gray.700");
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/notifications/${user.uid}`);
-        if (response.ok) {
-          const notificationsData = await response.json();
-          setNotifications(notificationsData);
-        } else {
-          console.error('Error getting notifications:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
+  const fetchNotifications = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/notifications/${user.uid}`);
+      if (response.ok) {
+        const notificationsData = await response.json();
+        setNotifications(notificationsData);
+      } else {
+        console.error('Error getting notifications:', response.statusText);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchNotifications();
   }, [user.uid]);
 
-  // Function to handle the "Message" button click and open the modal
   const handleMessageButtonClick = (notification) => {
     setSelectedNotification(notification);
     setMessageText(''); // Clear the message text when opening the modal
   };
 
-  // Function to handle the "Send" button click in the modal
   const handleSendMessage = async () => {
     try {
       // Make an API request here to send the message using selectedNotification.senderId and messageText
 
-      // Close the modal after sending the message
       setSelectedNotification(null);
       setMessageText('');
     } catch (error) {
@@ -51,48 +48,67 @@ const Notifications = () => {
     }
   };
 
-  // Function to handle the "Accept" button click and send the "response-gig" notification
   const handleAcceptClick = async (notification) => {
     try {
-      // Call the API to send the "response-gig" notification
-      const response = await fetch('http://localhost:3000/api/notifications/create', {
-        method: 'POST',
+      // Call the API to update the gig-request to gig-response-customer
+      const response = await fetch(`http://localhost:3000/api/notifications/update/${notification.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          receiverId: "NL31G8cnNuhMYjNXruZYXhRt3503", // Use the senderId from the original "gig-request" notification
-          senderId: user.uid,
-          text: 'Your gig request has been accepted!', // Customize the notification message
-          type: 'response-gig',
+          type: 'gig-response-customer',
+          text: `You have accepted to let business ${notification.senderName} take on your task!`, 
         }),
       });
 
       if (response.ok) {
-        // Handle the success response here (if needed)
-        console.log('Response-gig notification sent successfully');
+        console.log('Notification updated successfully');
+
+        // Notify the business user that their request was accepted
+        const notifyResponse = await fetch('http://localhost:3000/api/notifications/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            receiverId: notification.senderId,
+            senderId: user.uid,
+            text: 'Your gig request has been accepted!', 
+            type: 'gig-response-business',
+          }),
+        });
+
+        if (notifyResponse.ok) {
+          console.log('Business notified successfully');
+        } else {
+          console.error('Failed to notify business:', notifyResponse.statusText);
+        }
+
+        // Refresh the notifications
+        fetchNotifications();
       } else {
-        console.error('Failed to send response-gig notification:', response.statusText);
+        console.error('Failed to update notification:', response.statusText);
       }
     } catch (error) {
-      console.error('Error sending response-gig notification:', error);
+      console.error('Error updating notification:', error);
     }
   };
 
   return (
     <Flex direction="column" p={4} marginTop={100} maxW={1200} mx="auto">
-        <Flex align="center" mb={6}>
-            <Heading size="lg" fontWeight="bold">
-                Notifications
-            </Heading>
-            <Spacer />
-            <IconButton
-                fontSize="1.75rem"
-                color="gray.600"
-                aria-label="Notifications"
-                icon={<FaBell />}
-            />
-        </Flex>
+      <Flex align="center" mb={6}>
+          <Heading size="lg" fontWeight="bold">
+              Notifications
+          </Heading>
+          <Spacer />
+          <IconButton
+              fontSize="1.75rem"
+              color="gray.600"
+              aria-label="Notifications"
+              icon={<FaBell />}
+          />
+      </Flex>
       {notifications.length === 0 ? (
         <Text fontSize="xl" fontWeight="bold" color="red.500">
           No Notifications Yet!
@@ -100,21 +116,18 @@ const Notifications = () => {
       ) : (
         notifications.map((notification) => (
           notification.type === 'gig-request' ? (
-            // Render the GigRequestNotificationItem for notifications of type 'gig-request'
             <GigRequestNotificationItem
               key={notification.id}
               notification={notification}
               onMessageButtonClick={handleMessageButtonClick}
-              onAcceptClick={handleAcceptClick} // Pass the handleAcceptClick function to the component
+              onAcceptClick={handleAcceptClick} 
             />
           ) : (
-            // Render the regular NotificationItem for other types of notifications
             <NotificationItem key={notification.id} notification={notification} />
           )
         ))
       )}
 
-      {/* Modal for sending a message */}
       <Modal isOpen={selectedNotification && selectedNotification.type === 'gig-request'} onClose={() => setSelectedNotification(null)}>
         <ModalOverlay />
         <ModalContent>
@@ -140,5 +153,6 @@ const Notifications = () => {
 };
 
 export default Notifications;
+
 
 
