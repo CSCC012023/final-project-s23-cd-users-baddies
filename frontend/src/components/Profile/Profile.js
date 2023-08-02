@@ -1,4 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
+import { Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import {
   IconButton,
   Box,
@@ -18,7 +19,7 @@ import {
   Select,
   Grid,
   GridItem,
-  Image,
+  Image,useToast
 } from '@chakra-ui/react';
 import {
   FiHome,
@@ -32,10 +33,11 @@ import { UserContext } from '../User/UserContext';
 import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
 import ProfilePicture from './Profile pic.jpeg';
-
+import { initializeApp } from 'firebase/app';
 
 
 const Profile = () => {
+
   const LinkItems = [
     { name: 'Personal Info', icon: FiHome, content: PersonalInfoTab },
     { name: 'Business Info', icon: FiTrendingUp, content: BusinessInfoTab, isBusiness: true },
@@ -43,11 +45,22 @@ const Profile = () => {
   ];
   const user = useContext(UserContext);
   const [activeTab, setActiveTab] = useState(0);
-
+  const toast = useToast(); // Add this to display the toast notifications
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const auth = getAuth();
-  const db = getFirestore();
+  const firebaseConfig = {
+    apiKey: 'CHANGE_WITH_PEROSNAL',
+    authDomain: 'cd-user-baddies.firebaseapp.com',
+    projectId: 'cd-user-baddies',
+    storageBucket: 'cd-user-baddies.appspot.com',
+    messagingSenderId: 'CHANGE_WITH_PEROSNAL',
+    appId: '1:CHANGE_WITH_PEROSNAL:web:5c6ee1f310aec572c34df5',
+    measurementId: 'G-4026EEFZZ3',
+  };
+  
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
   const handleSignOut = () => {
     signOut(auth)
@@ -61,11 +74,16 @@ const Profile = () => {
 
   const handleSavePersonalInfo = async (name, number) => {
     if (name === '' || number === '') {
-      alert('Fields cannot be empty');
+      toast({
+        title: 'Fields can\'t be empty',
+        status: 'error',
+        duration: 1000,
+        isClosable: true,
+      });
       return;
     }
 
-    const userRef = doc(db, 'Users', auth.currentUser.uid);
+    const userRef = doc(db, 'User', auth.currentUser.uid);
 
     const userData = {
       Name: name,
@@ -74,11 +92,16 @@ const Profile = () => {
 
     await updateDoc(userRef, userData);
 
-    alert('Personal info saved successfully');
+    toast({
+      title: 'Personal info saved successfully',
+      status: 'success',
+      duration: 1000,
+      isClosable: true,
+    });
   };
 
   const handleSaveBusinessInfo = async (name, description, businessHours) => {
-    const userRef = doc(db, 'Users', auth.currentUser.uid);
+    const userRef = doc(db, 'User', auth.currentUser.uid);
 
     const userData = {
       Business: {
@@ -90,7 +113,12 @@ const Profile = () => {
 
     await updateDoc(userRef, userData);
 
-    alert('Business info saved successfully');
+    toast({
+      title: 'Business info saved successfully',
+      status: 'success',
+      duration: 1000,
+      isClosable: true,
+    });
   };
 
   function PersonalInfoTab() {
