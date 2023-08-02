@@ -45,4 +45,23 @@ const getUserNotifications = async (userId) => {
   }
 };
 
-module.exports = { createNotification, getUserNotifications };
+// Function to update a notification
+const updateNotification = async (userId, notificationId, newText, newType) => {
+    try {
+      const userRef = db.collection('User').doc(userId);
+      const notificationRef = userRef.collection('Notifications').doc(notificationId);
+  
+      await notificationRef.update({
+        text: newText,
+        type: newType,
+      });
+  
+      return { message: 'Notification updated successfully' };
+    } catch (error) {
+      console.error('Error updating notification:', error);
+      throw new Error('Internal server error');
+    }
+  };
+  
+
+module.exports = { createNotification, getUserNotifications, updateNotification };

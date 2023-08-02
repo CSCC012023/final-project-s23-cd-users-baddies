@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Map, Marker, GoogleApiWrapper } from 'google-maps-react';
 import { UserContext } from '../../User/UserContext';
-import { fetchPosts, applyForGig, listenForNewPosts, checkIfPostIsRequestedByUser } from './googleMapService';
+import { fetchPosts, applyForGig, listenForNewPosts, checkIfPostIsRequestedByUser, createNotification } from './googleMapService';
 import SelectedPostCard from './SelectedPostCard';
 import "../../../firebase/firebase";
 import {
@@ -92,9 +92,20 @@ export class GoogleMapContainer extends Component {
           ),
           selectedPost: { ...selectedPost, isButtonClicked: true },
         }));
+        console.log('this is the reciever id', selectedPost.postedBy);
+        // Create a notification of type 'gig-request' to the post owner
+        return createNotification(
+          selectedPost.postedBy.uid, // receiverId: the owner of the post
+          user.uid, // senderId: the user who is applying for the gig
+          'A user has requested your gig', // Notification text
+          'gig-request' // Notification type
+        );
+      })
+      .then(() => {
+        console.log('Gig request notification sent successfully');
       })
       .catch((error) => {
-        console.error('Error applying for the gig:', error);
+        console.error('Error applying for the gig or sending notification:', error);
       });
   };
   

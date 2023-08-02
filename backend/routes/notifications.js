@@ -26,4 +26,17 @@ router.get('/:userId', async (req, res) => {
   }
 });
 
+// Route to update a notification
+router.put('/:userId/:notificationId', async (req, res) => {
+    const { userId, notificationId } = req.params;
+    const { text, type } = req.body;
+  
+    try {
+      const result = await notificationsController.updateNotification(userId, notificationId, text, type);
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
 module.exports = router;
