@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices, addBusinessUserService, editUserService } = require('../controllers/usersController');
+const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices, deleteUserService, addBusinessUserService, editUserService } = require('../controllers/usersController');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -62,6 +62,22 @@ router.post('/services/:userId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Delete service for a user
+router.delete('/services/:userId/:serviceId', async (req, res) => {
+  try {
+    const { userId, serviceId } = req.params;
+
+    // Call the function to delete the service
+    await deleteUserService(userId, serviceId);
+
+    res.json({ message: 'Service deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user service:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Edit service fields
 router.put('/services/:userId/:serviceId', async (req, res) => {
