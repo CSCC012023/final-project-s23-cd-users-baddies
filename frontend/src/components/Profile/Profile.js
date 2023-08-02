@@ -1,40 +1,40 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
+import React, { useState, useContext, } from 'react';
 import {
   IconButton,
   Box,
   CloseButton,
   Flex,
   Icon,
-  useColorModeValue,
   Text,
   Drawer,
   DrawerContent,
   useDisclosure,
-  BoxProps,
-  FlexProps,
+  HStack,
+  VStack,
   Input,
-  FormControl,
   Button,
   Select,
-  Grid,
-  GridItem,
-  Image,useToast
+  useToast,Grid,GridItem
 } from '@chakra-ui/react';
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
 import {
   FiHome,
   FiTrendingUp,
-  FiCompass,
   FiStar,
-  FiSettings,
   FiMenu,
 } from 'react-icons/fi';
 import { UserContext } from '../User/UserContext';
 import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
-import ProfilePicture from './Profile pic.jpeg';
 import { initializeApp } from 'firebase/app';
 
+const DateButton = ({ label, onClick }) => {
+  return (
+    <Button justifyContent="flex-start" width="100%" minWidth="40" onClick={onClick}>
+      {label}
+    </Button>
+  );
+};
 
 const Profile = () => {
 
@@ -57,7 +57,7 @@ const Profile = () => {
     appId: '1:984565407792:web:5c6ee1f310aec572c34df5',
     measurementId: 'G-4026EEFZZ3',
   };
-  
+
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
@@ -130,13 +130,12 @@ const Profile = () => {
     };
 
     return (
-      
-      <Flex direction="column" mt="24"  mb={8}>
+
+      <Flex direction="column" mt="24" mb={8}>
         <Text fontWeight="bold" mb={2}>
           Full Name
         </Text>
         <Input
-          colorScheme="gray"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
@@ -159,21 +158,67 @@ const Profile = () => {
 
   function BusinessInfoTab() {
     const [businessName, setBusinessName] = useState(user.Business?.Name || '');
-    const [businessDescription, setBusinessDescription] = useState(user.Business?.Description || '');
-    const [businessHours, setBusinessHours] = useState(user.Business?.Hours || {});
+    const [businessDescription, setBusinessDescription] = useState(
+      user.Business?.Description || ''
+    );
+    const [businessHours, setBusinessHours] = useState(
+      user.Business?.Hours || {
+        Monday: { isClosed: false, startHour: null, endHour: null },
+        Tuesday: { isClosed: false, startHour: null, endHour: null },
+        Wednesday: { isClosed: false, startHour: null, endHour: null },
+        Thursday: { isClosed: false, startHour: null, endHour: null },
+        Friday: { isClosed: false, startHour: null, endHour: null },
+        Saturday: { isClosed: false, startHour: null, endHour: null },
+        Sunday: { isClosed: false, startHour: null, endHour: null },
+      }
+    );
+    const [selectedDay, setSelectedDay] = useState(null);
+
+    const handleDateButtonClick = (day) => {
+      setSelectedDay(day);
+    };
+
+    const handleCheckClosed = (day) => {
+      const isDayClosed = isClosed(day);
+      setBusinessHours((prevHours) => ({
+        ...prevHours,
+        [day]: {
+          ...prevHours[day],
+          isClosed: !isDayClosed,
+        },
+      }));
+    };
+
+    const formatHour = (hour) => (hour ? `${hour}:00` : '');
+
+    const isClosed = (day) => businessHours[day]?.isClosed;
 
     const handleSave = () => {
-      handleSaveBusinessInfo(businessName, businessDescription, businessHours);
+      const hasInvalidHours = Object.values(businessHours).some(
+        (hour) =>
+          !hour.isClosed &&
+          (hour.startHour === null || hour.endHour === null)
+      );
+
+      if (hasInvalidHours) {
+        toast({
+          title: "Hours can't be empty",
+          status: 'error',
+          duration: 1000,
+          isClosable: true,
+        });
+      } else {
+        handleSaveBusinessInfo(businessName, businessDescription, businessHours);
+      }
     };
 
     return (
       <>
-        <Flex direction="column"  mt="24" mb={4}>
+        <Flex direction="column" mt="24" mb={4}>
           <Text fontWeight="bold" mb={2}>
             Business Name
           </Text>
           <Input
-            colorScheme="gray"
             type="text"
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
@@ -184,75 +229,114 @@ const Profile = () => {
             Business Description
           </Text>
           <Input
-            colorScheme="gray"
             type="text"
             value={businessDescription}
             onChange={(e) => setBusinessDescription(e.target.value)}
           />
         </Flex>
-                <Text fontWeight="bold" mb={2}>
+        <Text fontWeight="bold" mb={2}>
           Rating
         </Text>
         <Text>{user.Rating}</Text>
-        <FormControl mt="3%">
-          <Text as="h3" size="m" pb="10px" textAlign="left" mb="-15">
-            Business Hours
-          </Text>
-          <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-            {Object.keys(businessHours).map((day) => {
-              const startHour = businessHours[day]?.startHour || '00:00';
-              const endHour = businessHours[day]?.endHour || '23:00';
+        <Grid templateColumns='repeat(2, 1fr)' templateRows='repeat(1, 1fr)' gap={4}>
 
-              return (
-                <GridItem key={day}>
-                  <Flex flexDirection="column">
-                    <Text>{day}</Text>
-                    <Flex flexDirection="row" justifyContent="space-between">
-                      <Select
-                        placeholder="Start Hour"
-                        defaultValue={startHour}
-                        onChange={(e) =>
-                          setBusinessHours((prevHours) => ({
-                            ...prevHours,
-                            [day]: { ...prevHours[day], startHour: e.target.value },
-                          }))
-                        }
-                      >
-                        {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
-                          <option key={hour} value={hour}>
-                            {hour}:00
-                          </option>
-                        ))}
-                      </Select>
-                      <Select
-                        placeholder="End Hour"
-                        defaultValue={endHour}
-                        onChange={(e) =>
-                          setBusinessHours((prevHours) => ({
-                            ...prevHours,
-                            [day]: { ...prevHours[day], endHour: e.target.value },
-                          }))
-                        }
-                      >
-                        {Array.from({ length: 24 }, (_, i) => i + 1).map((hour) => (
-                          <option key={hour} value={hour}>
-                            {hour}:00
-                          </option>
-                        ))}
-                      </Select>
-                    </Flex>
+        <GridItem colSpan={1} rowSpan={1} h='10' >
+        <Flex justifyContent="center" mb={4}>
+          <HStack>
+            <VStack>
+              {Object.keys(businessHours).map((day) => (
+                <Flex key={day} justifyContent="space-between" width="100%">
+                  <DateButton
+                    label={day}
+                    onClick={() => handleDateButtonClick(day)}
+                  />
+                  <IconButton
+                    icon={isClosed(day) ? <CloseIcon /> : <CheckIcon />}
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => handleCheckClosed(day)}
+                  />
+                </Flex>
+              ))}
+            </VStack>
+          </HStack>
+        </Flex>
+          </GridItem>
+          <GridItem  colSpan={1} rowSpan={2} h='10' >
+        <Flex justifyContent="center">
+          <VStack>
+            <Text fontWeight="bold" mb={2}>
+              Business Hours
+            </Text>
+            {Object.keys(businessHours).map((day) => (
+              <Flex key={day} flexDirection="column">
+                <Text fontSize="lg">{day}</Text>
+                {selectedDay === day && !isClosed(day) ? (
+                  <Flex flexDirection="row" justifyContent="space-between">
+                    <Select
+                      placeholder="Start Hour"
+                      value={businessHours[selectedDay]?.startHour || ''}
+                      onChange={(e) =>
+                        setBusinessHours((prevHours) => ({
+                          ...prevHours,
+                          [selectedDay]: {
+                            ...prevHours[selectedDay],
+                            startHour: e.target.value,
+                          },
+                        }))
+                      }
+                    >
+                      {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                        <option key={hour} value={hour}>
+                          {hour}:00
+                        </option>
+                      ))}
+                    </Select>
+                    <Select
+                      placeholder="End Hour"
+                      value={businessHours[selectedDay]?.endHour || ''}
+                      onChange={(e) =>
+                        setBusinessHours((prevHours) => ({
+                          ...prevHours,
+                          [selectedDay]: {
+                            ...prevHours[selectedDay],
+                            endHour: e.target.value,
+                          },
+                        }))
+                      }
+                    >
+                      {Array.from({ length: 24 }, (_, i) => i + 1).map((hour) => (
+                        <option key={hour} value={hour}>
+                          {hour}:00
+                        </option>
+                      ))}
+                    </Select>
                   </Flex>
-                </GridItem>
-              );
-            })}
-          </Grid>
-        </FormControl>
-        <Button mt={4} colorScheme="blue" onClick={handleSave}>
+                ) : (
+                  <Text fontSize="md">
+                    {isClosed(day)
+                      ? 'Closed'
+                      : `${formatHour(businessHours[day]?.startHour)} - ${formatHour(
+                        businessHours[day]?.endHour
+                      )}`}
+                  </Text>
+                )}
+              </Flex>
+            ))}
+          </VStack>
+        </Flex>
+          </GridItem>
+          <GridItem  colSpan={2} rowSpan={1}>
+          <Button mt={4} colorScheme="blue" onClick={handleSave}>
           Save
-        </Button>
+            </Button>
+            </GridItem>
+        </Grid>
+
       </>
     );
   }
+
 
   function LogoutTab() {
     return (
@@ -271,9 +355,7 @@ const Profile = () => {
 
     return (
       <Box
-        bg={useColorModeValue('white', 'gray.900')}
         borderRight="1px"
-        borderRightColor={useColorModeValue('gray.200', 'gray.700')}
         w={{ base: 'full', md: 60 }}
         pos="fixed"
         h="full"
@@ -344,9 +426,7 @@ const Profile = () => {
         px={{ base: 4, md: 24 }}
         height="20"
         alignItems="center"
-        bg={useColorModeValue('white', 'gray.900')}
         borderBottomWidth="1px"
-        borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
         justifyContent="flex-start"
         {...rest}
       >
@@ -365,7 +445,7 @@ const Profile = () => {
   }
 
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
+    <Box minH="100vh">
       <SidebarContent onClose={onClose} display={{ base: 'none', md: 'block' }} />
       <Drawer
         isOpen={isOpen}
