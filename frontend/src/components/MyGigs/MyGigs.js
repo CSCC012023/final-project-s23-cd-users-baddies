@@ -71,11 +71,11 @@ const MyGigs = () => {
         p={4}
       >
         <Stack spacing={3} direction="row" align="center" display="flex">
-          <Button colorScheme="teal" onClick={() => filterPostsByStatus("request-gig")}>
-            Request
-          </Button>
-          <Button colorScheme="red" onClick={() => filterPostsByStatus("requested")}>
+          <Button colorScheme="teal" onClick={() => filterPostsByStatus("requested")}>
             Requested
+          </Button>
+          <Button colorScheme="red" onClick={() => filterPostsByStatus("pending")}>
+            Pending
           </Button>
           <Button colorScheme="teal" onClick={() => filterPostsByStatus("completed")}>
             Completed

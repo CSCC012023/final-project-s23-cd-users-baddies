@@ -68,6 +68,22 @@ const updateGigStatus = async (gid, newStatus) => {
     }
   };
 
-module.exports = { getUserGigs, createGig, updateGigStatus, deleteGig };
+  const checkIfPostRequestedByUser = async (uid, pid) => {
+    try {
+      const gigsRef = db.collection('Gigs');
+      const querySnapshot = await gigsRef
+        .where('business', '==', db.doc(`User/${uid}`))
+        .where('post', '==', db.doc(`Posts/${pid}`))
+        .where('status', '==', 'requested')
+        .get();
+  
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error('Error checking if post is requested by user:', error);
+      throw new Error('Internal server error');
+    }
+  };
+
+module.exports = { getUserGigs, createGig, updateGigStatus, deleteGig, checkIfPostRequestedByUser };
 
 
