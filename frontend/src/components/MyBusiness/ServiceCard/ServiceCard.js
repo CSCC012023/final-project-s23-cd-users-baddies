@@ -26,7 +26,7 @@ import {
 } from '@chakra-ui/react';
 import { UserContext } from '../../User/UserContext';
 
-function ServiceCard({ serviceId,name, description, price, duration }) {
+function ServiceCard({ serviceId,name, description, price, duration, onDeleteService }) {
   const [editedService, setEditedService] = useState({
     serviceName: name,
     description: description,
@@ -34,6 +34,33 @@ function ServiceCard({ serviceId,name, description, price, duration }) {
     duration: duration,
   });
   const [isOpen, setIsOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [serviceToDelete, setServiceToDelete] = useState('');
+
+  const handleCloseDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleOpenDeleteModal = () => {
+    setServiceToDelete(serviceId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+
+      const response = await axios.delete(
+        `http://localhost:3000/api/users/services/${user.uid}/${serviceId}`
+      );
+
+      console.log(response.data);
+
+      onDeleteService(serviceId)
+      handleCloseDeleteModal();
+    } catch (error) {
+      console.error('Error deleting service:', error);
+    }
+  };
 
 
   const handleOpenEditModal = () => {
@@ -101,7 +128,7 @@ function ServiceCard({ serviceId,name, description, price, duration }) {
           <Button variant="ghost" colorScheme="blue" onClick={handleOpenEditModal}>
             Edit
           </Button>
-          <Button variant="solid" colorScheme="blue">
+          <Button variant="solid" colorScheme="blue" onClick={handleOpenDeleteModal}>
             Delete
           </Button>
         </ButtonGroup>
@@ -147,6 +174,24 @@ function ServiceCard({ serviceId,name, description, price, duration }) {
             </Button>
             <Button colorScheme="blue" onClick={handleSaveChanges}>
               Save Changes
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal isOpen={isDeleteModalOpen} onClose={handleCloseDeleteModal}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Are you sure you want to delete this service?</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={handleCloseDeleteModal}>
+              Cancel
+            </Button>
+            <Button colorScheme="red" onClick={handleConfirmDelete}>
+              Confirm Delete
             </Button>
           </ModalFooter>
         </ModalContent>

@@ -45,8 +45,6 @@ const MyBusiness = () => {
   const [activeTab, setActiveTab] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // Your other Firebase and business-related functions and states can go here
-
   // Function for handling the navigation items in the sidebar
   function NavItem({ icon, children, onClick, ...rest }) {
     return (
@@ -146,7 +144,7 @@ const MyBusiness = () => {
     const handleAddService = async () => {
       try {
         const response = await axios.post(`http://localhost:3000/api/users/services/${user.uid}`, newService);
-        console.log(response.data); // Log the response from the backend (optional)
+        console.log(response.data);
         onClose();
         fetchUserServices();
       } catch (error) {
@@ -172,6 +170,8 @@ const MyBusiness = () => {
               description={service.description}
               price={service.price}
               duration={service.duration}
+              onDeleteService={fetchUserServices}
+
 
             />
           ))}
@@ -272,7 +272,6 @@ const MyBusiness = () => {
       </Drawer>
 
       <Box ml={{ base: 0, md: 60 }} p="4">
-        {/* Content */}
         {activeTab < LinkItems.length && React.createElement(LinkItems[activeTab].content)}
       </Box>
     </Box>
