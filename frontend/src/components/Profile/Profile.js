@@ -9,12 +9,12 @@ import {
   Drawer,
   DrawerContent,
   useDisclosure,
-  HStack,
+  Spacer,
   VStack,
   Input,
   Button,
   Select,
-  useToast,Grid,GridItem
+  useToast, Grid, GridItem
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
 import {
@@ -238,32 +238,23 @@ const Profile = () => {
           Rating
         </Text>
         <Text>{user.Rating}</Text>
-        <Grid templateColumns='repeat(2, 1fr)' templateRows='repeat(1, 1fr)' gap={4}>
-
-        <GridItem colSpan={1} rowSpan={1} h='10' >
-        <Flex justifyContent="center" mb={4}>
-          <HStack>
-            <VStack>
-              {Object.keys(businessHours).map((day) => (
-                <Flex key={day} justifyContent="space-between" width="100%">
-                  <DateButton
-                    label={day}
-                    onClick={() => handleDateButtonClick(day)}
-                  />
-                  <IconButton
-                    icon={isClosed(day) ? <CloseIcon /> : <CheckIcon />}
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleCheckClosed(day)}
-                  />
-                </Flex>
-              ))}
-            </VStack>
-          </HStack>
-        </Flex>
-          </GridItem>
-          <GridItem  colSpan={1} rowSpan={2} h='10' >
-        <Flex justifyContent="center">
+        <Grid templateColumns="repeat(2, 1fr)" gap={10}>
+          <VStack>
+            {Object.keys(businessHours).map((day) => (
+              <Flex key={day} justifyContent="space-between" width="100%">
+                <DateButton
+                  label={day}
+                  onClick={() => handleDateButtonClick(day)}
+                />
+                <IconButton
+                  icon={isClosed(day) ? <CloseIcon /> : <CheckIcon />}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleCheckClosed(day)}
+                />
+              </Flex>
+            ))}
+          </VStack>
           <VStack>
             <Text fontWeight="bold" mb={2}>
               Business Hours
@@ -324,17 +315,15 @@ const Profile = () => {
               </Flex>
             ))}
           </VStack>
-        </Flex>
-          </GridItem>
-          <GridItem  colSpan={2} rowSpan={1}>
-          <Button mt={4} colorScheme="blue" onClick={handleSave}>
-          Save
-            </Button>
-            </GridItem>
         </Grid>
-
+        <Flex mt={4} justifyContent="center">
+          <Button colorScheme="blue" onClick={handleSave}>
+            Save
+          </Button>
+        </Flex>
       </>
     );
+
   }
 
 
