@@ -8,7 +8,7 @@ router.post('/:senderId/:receiverId', async (req, res) => {
     const { senderId, receiverId } = req.params;
     const { text } = req.body;
 
-    const result = await sendMessage(senderId, receiverId, text);
+    const result = await sendMessage(senderId, receiverId, text, req.app.get('io'));
     res.json(result);
   } catch (error) {
     console.error('Error sending message:', error);
