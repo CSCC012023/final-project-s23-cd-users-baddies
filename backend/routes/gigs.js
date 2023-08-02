@@ -50,5 +50,17 @@ router.delete('/:gid/:uid', async (req, res) => {
     }
 });
 
+// Route to check if the post is requested by the user
+router.get('/users/:uid/checkIfPostRequested/:pid', async (req, res) => {
+    const { uid, pid } = req.params;
+  
+    try {
+      const isPostRequested = await gigsController.checkIfPostRequestedByUser(uid, pid);
+      res.status(200).json({ isPostRequested });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
 module.exports = router;
 

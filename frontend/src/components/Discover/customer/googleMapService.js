@@ -72,5 +72,22 @@ const createNotification = async (receiverId, senderId, text, type) => {
     }
   };
   
-export { fetchPosts, applyForGig, listenForNewPosts, createNotification };
+  const checkIfPostIsRequestedByUser = async (selectedPost, userId) => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/gigs/users/${userId}/checkIfPostRequested/${selectedPost.pid}`);
+      if (!response.ok) {
+        throw new Error('Failed to check if post is requested by user');
+      }
+  
+      const data = await response.json();
+      return data.isPostRequested;
+    } catch (error) {
+      console.error('Error checking if post is requested by user:', error);
+      throw new Error('Error checking if post is requested by user');
+    }
+  };
+  
+  
+
+export { fetchPosts, applyForGig, listenForNewPosts, createNotification, checkIfPostIsRequestedByUser };
 

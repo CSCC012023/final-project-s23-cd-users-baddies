@@ -19,15 +19,16 @@ const GigRequestNotificationItem = ({ notification, onMessageButtonClick, onAcce
 
   return (
     <Flex
-      direction="column"
-      borderWidth="1px"
-      borderRadius="md"
-      p={3}
-      mb={2}
-      bg="gray.200"
+        direction="column"
+        borderWidth="1px"
+        borderRadius="lg"
+        p={4}
+        m={4}
+        boxShadow="sm"
+        bg="gray.200"
     >
       <Flex justify="space-between" mb={2}>
-        <Text fontWeight="bold">{notification.text}</Text>
+        <Text fontSize="lg" fontWeight="bold">{notification.text}</Text>
         <Text fontSize="sm" color="gray.600">
           {new Date(notification.timestamp).toLocaleString()}
         </Text>

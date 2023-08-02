@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../User/UserContext';
-import { Flex, Text, Box, Divider, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalFooter, ModalBody, Input } from "@chakra-ui/react";
+import { Flex, Text, Box, Spacer, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalFooter, ModalBody, Input, useColorModeValue, VStack, Heading, IconButton } from "@chakra-ui/react";
 import { IoMdNotifications } from 'react-icons/io';
 import NotificationItem from './NotificationItem';
 import GigRequestNotificationItem from './GigRequestNotificationItem';
+import { FaBell } from "react-icons/fa";
 
 const Notifications = () => {
   const user = useContext(UserContext);
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [messageText, setMessageText] = useState('');
+
+  const bg = useColorModeValue("gray.100", "gray.700");
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -77,13 +80,19 @@ const Notifications = () => {
   };
 
   return (
-    <Flex direction="column" p={4}>
-      <Flex align="center" mb={4}>
-        <Box as={IoMdNotifications} fontSize="2xl" color="gray.600" mr={2} />
-        <Text fontSize="2xl" fontWeight="bold">
-          Notifications
-        </Text>
-      </Flex>
+    <Flex direction="column" p={4} marginTop={100} maxW={1200} mx="auto">
+        <Flex align="center" mb={6}>
+            <Heading size="lg" fontWeight="bold">
+                Notifications
+            </Heading>
+            <Spacer />
+            <IconButton
+                fontSize="1.75rem"
+                color="gray.600"
+                aria-label="Notifications"
+                icon={<FaBell />}
+            />
+        </Flex>
       {notifications.length === 0 ? (
         <Text fontSize="xl" fontWeight="bold" color="red.500">
           No Notifications Yet!
