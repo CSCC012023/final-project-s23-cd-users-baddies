@@ -165,32 +165,6 @@ const Login = () => {
 
   };
 
-  // const handleUserType = async (type) => {
-  //   if (!phoneNumber || !location) {
-  //     console.log('Please input your phone number and select a location');
-  //     return;
-  //   }
-
-  //   const userData = {
-  //     uid: auth.currentUser.uid,
-  //     userType: type,
-  //     Name: auth.currentUser.displayName,
-  //     contactNumber: phoneNumber,
-  //     postalCode: postalCode,
-  //     Rating: 5,
-  //     Location: location,
-  //   };
-
-  //   if (type === 'business') {
-  //     console.log("hi");
-  //     setShowBusinessForm(true);
-  //   } else {
-  //     await setDoc(doc(db, 'User', auth.currentUser.uid), userData);
-  //     setUser(userData);
-  //     setNewUser(false);
-  //   }
-  // };
-
   const handleBusinessFormSubmit = async () => {
     if (!businessName || !businessDescription || Object.keys(businessHours).length === 0) {
       setError('Please fill in all the required information');
