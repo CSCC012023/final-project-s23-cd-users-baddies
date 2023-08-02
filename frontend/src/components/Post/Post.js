@@ -17,7 +17,7 @@ import {
   FormHelperText,
   InputRightElement,
   Text,
-   useToast
+  useToast
 } from "@chakra-ui/react";
 import { FaMagic } from 'react-icons/fa';
 import TextareaAutosize from 'react-textarea-autosize';
@@ -35,48 +35,79 @@ const Post = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
-  const [location, setLocation] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const navigate = useNavigate();
 
+  const isValidPostalCode = (postalCode) => {
+    const postalCodeRegex = /^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/;
+    return postalCodeRegex.test(postalCode);
+  };
+  const isNumeric = (price) => {
+    return !isNaN(parseFloat(price)) && isFinite(price);
+  };
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    if (!isValidPostalCode(postalCode)) {
+      toast({
+        title: "Invalid postal code.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    if (!isNumeric(price)) {
+      toast({
+        title: "Price must be a number.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
     try {
       // Fetch coordinates from the location
-      const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
-      const geocodeResponse = await fetch(geocodeUrl);
-      const geocodeData = await geocodeResponse.json();
+      fetch("https://maps.googleapis.com/maps/api/geocode/json?address=" + postalCode + '&key=AIzaSyAWgPNBM-zYLfCEsVdAvaIrfgZBOXWoQhw')
+        .then(response => response.json())
+        .then(async data => {
+          console.log(data)
+          const lat = data.results[0].geometry.location.lat;
+          const lon = data.results[0].geometry.location.lng;
+          // Make a POST request to the backend API
+          const res = await fetch(`http://localhost:3000/api/posts/users/${user.uid}/posts`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              title,
+              description,
+              price: parseFloat(price), // Convert to a number
+              location: { lat, lon },
+              postalCode,
+              status: 'posted',
+              postedBy: `/User/${user.uid}`, // Reference to the user who created the post
+            })
 
-      if (geocodeData && geocodeData.length > 0) {
-        const { lat, lon } = geocodeData[0];
-
-        // Make a POST request to the backend API
-        const response = await fetch(`http://localhost:3000/api/posts/users/${user.uid}/posts`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            title,
-            description,
-            price: parseFloat(price), // Convert to a number
-            location: { lat, lon },
-            postalCode,
-            status: 'posted',
-            postedBy: `/User/${user.uid}`, // Reference to the user who created the post
-          })
-        });
-
-        if (response.ok) {
-          console.log('Post added successfully.');
-          navigate('/');
-        } else {
-          console.error('Error adding post:', response.statusText);
-        }
-      } else {
-        console.error('Could not geocode the location.');
-      }
+          }
+          );
+          if (res.ok) {
+            toast({
+              title: "Posted!",
+              status: "success",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+          else {
+            toast({
+              title: "Error posting :(",
+              status: "error",
+              duration: 3000,
+              isClosable: true,
+            });
+          }
+        })
     } catch (error) {
       console.error('Error adding post:', error);
     }
@@ -105,6 +136,7 @@ const Post = () => {
   return (
     <form className="post-form" onSubmit={handleSubmit}>
       <Flex
+        paddingTop={100}
         flexDirection="column"
         width="100%"
         height="100%"
@@ -124,19 +156,6 @@ const Post = () => {
             boxShadow="md"
           >
 
-
-            <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
-              Postal code
-            </Text>
-
-
-            <FormControl>
-              <InputGroup>
-                <Input placeholder="Postal code" pr="180px" pt='0%' mt='1%'
-                  value={postalCode} onChange={e => setPostalCode(e.target.value)} />
-              </InputGroup>
-            </FormControl>
-
             <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
               Title
             </Text>
@@ -154,25 +173,25 @@ const Post = () => {
             </Text>
 
             <FormControl>
-      <InputGroup>
-        <TextareaAutosize
-          style={{
-            paddingRight: '180px',
-            paddingTop: '0%',
-            marginTop: '1%',
-            minWidth: '100%',
-          }}
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <InputRightElement>
-          <Button onClick={handleWizard}>
-            <FaMagic />
-          </Button>
-        </InputRightElement>
-      </InputGroup>
-    </FormControl>
+              <InputGroup>
+                <TextareaAutosize
+                  style={{
+                    paddingRight: '180px',
+                    paddingTop: '0%',
+                    marginTop: '1%',
+                    minWidth: '100%',
+                  }}
+                  placeholder="Description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+                <InputRightElement>
+                  <Button onClick={handleWizard}>
+                    <FaMagic />
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+            </FormControl>
 
 
             <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
@@ -186,20 +205,18 @@ const Post = () => {
                   value={price} onChange={e => setPrice(e.target.value)} />
               </InputGroup>
             </FormControl>
+
+
+
+            <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
+              Postal code
+            </Text>
+
+
             <FormControl>
-
-
-              <Text as='h3' size='m' pb='10px' textAlign={"left"} mb='-15'>
-                Location
-              </Text>
               <InputGroup>
-
-                <Input
-                  placeholder="Location" mt='2%'
-                  value={location} onChange={e => setLocation(e.target.value)}
-                />
-                <InputRightElement width="4.5rem">
-                </InputRightElement>
+                <Input placeholder="Postal code" pr="180px" pt='0%' mt='1%'
+                  value={postalCode} onChange={e => setPostalCode(e.target.value)} />
               </InputGroup>
             </FormControl>
 
