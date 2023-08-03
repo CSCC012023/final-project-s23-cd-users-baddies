@@ -25,38 +25,53 @@ const createNotification = async (receiverId, senderId, text, type) => {
 
 // Function to get all notifications for a user in order from latest to oldest
 const getUserNotifications = async (userId) => {
-  try {
-    const userRef = db.collection('User').doc(userId);
-
-    const notificationsSnapshot = await userRef
-      .collection('Notifications')
-      .orderBy('timestamp', 'desc')
-      .get();
-
-    const notifications = [];
-    notificationsSnapshot.forEach((doc) => {
-      notifications.push(doc.data());
-    });
-
-    return notifications;
-  } catch (error) {
-    console.error('Error getting user notifications:', error);
-    throw new Error('Internal server error');
-  }
-};
-
-// Function to update a notification
-const updateNotification = async (userId, notificationId, newText, newType) => {
     try {
       const userRef = db.collection('User').doc(userId);
-      const notificationRef = userRef.collection('Notifications').doc(notificationId);
   
-      await notificationRef.update({
-        text: newText,
-        type: newType,
-      });
+      const notificationsSnapshot = await userRef
+        .collection('Notifications')
+        .orderBy('timestamp', 'desc')
+        .get();
   
-      return { message: 'Notification updated successfully' };
+      const notifications = [];
+      for (let doc of notificationsSnapshot.docs) {
+        const notificationData = doc.data();
+        // Resolve the sender reference
+        const senderData = (await notificationData.sender.get()).data();
+  
+        notifications.push({
+          ...notificationData,
+          sender: senderData,  // Replace the sender reference with the actual data
+          id: doc.id, // Use the document id as the identifier
+        });
+      }
+  
+      return notifications;
+    } catch (error) {
+      console.error('Error getting user notifications:', error);
+      throw new Error('Internal server error');
+    }
+  };
+
+// Function to update a notification
+const updateNotification = async (userId, timestamp, updatedFields) => {
+    try {
+      const userRef = db.collection('User').doc(userId);
+  
+      const notificationsSnapshot = await userRef
+        .collection('Notifications')
+        .where('timestamp', '==', timestamp)
+        .get();
+  
+      if (!notificationsSnapshot.empty) {
+        notificationsSnapshot.forEach(async (doc) => {
+          await doc.ref.update(updatedFields);
+        });
+  
+        return { message: 'Notification updated successfully' };
+      } else {
+        throw new Error('Notification not found');
+      }
     } catch (error) {
       console.error('Error updating notification:', error);
       throw new Error('Internal server error');

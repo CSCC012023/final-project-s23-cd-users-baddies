@@ -50,50 +50,118 @@ const Notifications = () => {
 
   const handleAcceptClick = async (notification) => {
     try {
-      // Call the API to update the gig-request to gig-response-customer
-      const response = await fetch(`http://localhost:3000/api/notifications/update/${notification.id}`, {
+      const updatedTimestamp = Date.now();
+      
+      // Call the API to update the customer's notification
+      const responseUpdate = await fetch(`http://localhost:3000/api/notifications/${user.uid}/${notification.timestamp}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          text: `You have accepted to let business ${notification.senderId} take on your task!`,
           type: 'gig-response-customer',
-          text: `You have accepted to let business ${notification.senderName} take on your task!`, 
+          timestamp: updatedTimestamp,  // Updating the timestamp
         }),
       });
-
-      if (response.ok) {
-        console.log('Notification updated successfully');
-
-        // Notify the business user that their request was accepted
-        const notifyResponse = await fetch('http://localhost:3000/api/notifications/create', {
+  
+      if (responseUpdate.ok) {
+        // Update the customer's notification in the local state
+        setNotifications(notifications.map((notif) => {
+          if (notif.timestamp === notification.timestamp) {
+            return {
+              ...notif,
+              text: `You have accepted to let business ${notification.sender.Business.Name} take on your task!`,
+              type: 'gig-response-customer',
+              timestamp: updatedTimestamp,
+            };
+          } else {
+            return notif;
+          }
+        }));
+  
+        // Create a new notification for the business
+        const responseCreate = await fetch('http://localhost:3000/api/notifications/create', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            receiverId: notification.senderId,
+            receiverId: notification.sender.uid, // The sender of the original notification
             senderId: user.uid,
-            text: 'Your gig request has been accepted!', 
+            text: `User ${user.uid} has accepted your task!`,
             type: 'gig-response-business',
           }),
         });
-
-        if (notifyResponse.ok) {
-          console.log('Business notified successfully');
-        } else {
-          console.error('Failed to notify business:', notifyResponse.statusText);
+  
+        if (!responseCreate.ok) {
+          console.error('Failed to create notification:', responseCreate.statusText);
         }
-
-        // Refresh the notifications
-        fetchNotifications();
       } else {
-        console.error('Failed to update notification:', response.statusText);
+        console.error('Failed to update notification:', responseUpdate.statusText);
       }
     } catch (error) {
-      console.error('Error updating notification:', error);
+      console.error('Error handling accept click:', error);
     }
   };
+
+  const handleDeclineClick = async (notification) => {
+    try {
+      const updatedTimestamp = Date.now();
+      
+      // Call the API to update the customer's notification
+      const responseUpdate = await fetch(`http://localhost:3000/api/notifications/${user.uid}/${notification.timestamp}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: `You have declined business ${notification.sender.Business.Name} from taking on your task!`,
+          type: 'gig-decline-customer',
+          timestamp: updatedTimestamp,
+        }),
+      });
+
+      if (responseUpdate.ok) {
+        // Update the customer's notification in the local state
+        setNotifications(notifications.map((notif) => {
+          if (notif.timestamp === notification.timestamp) {
+            return {
+              ...notif,
+              text: `You have declined business ${notification.sender.Business.Name} from taking on your task!`,
+              type: 'gig-decline-customer',
+              timestamp: updatedTimestamp,
+            };
+          } else {
+            return notif;
+          }
+        }));
+
+        // Create a new notification for the business
+        const responseCreate = await fetch('http://localhost:3000/api/notifications/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            receiverId: notification.sender.uid, // The sender of the original notification
+            senderId: user.uid,
+            text: `User ${user.uid} has declined your task!`,
+            type: 'gig-decline-business',
+          }),
+        });
+
+        if (!responseCreate.ok) {
+          console.error('Failed to create notification:', responseCreate.statusText);
+        }
+      } else {
+        console.error('Failed to update notification:', responseUpdate.statusText);
+      }
+    } catch (error) {
+      console.error('Error handling decline click:', error);
+    }
+  };
+  
 
   return (
     <Flex direction="column" p={4} marginTop={100} maxW={1200} mx="auto">
@@ -117,10 +185,11 @@ const Notifications = () => {
         notifications.map((notification) => (
           notification.type === 'gig-request' ? (
             <GigRequestNotificationItem
-              key={notification.id}
-              notification={notification}
-              onMessageButtonClick={handleMessageButtonClick}
-              onAcceptClick={handleAcceptClick} 
+            key={notification.id}
+            notification={notification}
+            onMessageButtonClick={handleMessageButtonClick}
+            onAcceptClick={handleAcceptClick}
+            onDeclineClick={handleDeclineClick}
             />
           ) : (
             <NotificationItem key={notification.id} notification={notification} />
