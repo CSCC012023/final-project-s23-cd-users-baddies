@@ -52,6 +52,40 @@ const Notifications = () => {
     try {
       const updatedTimestamp = Date.now();
       
+      // Update the status of the gig to "in-progress"
+      console.log(notification.gig.gid)
+      const responseGigUpdate = await fetch(`http://localhost:3000/api/gigs/${notification.gig.gid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          newStatus: 'in-progress',
+        }),
+      });
+  
+      if (!responseGigUpdate.ok) {
+        console.error('Failed to update gig status:', responseGigUpdate.statusText);
+        return;
+      }
+  
+      // Call the API to update the post status to "in-progress"
+      const responsePostUpdate = await fetch(`http://localhost:3000/api/posts/${notification.post.pid}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: 'in-progress',
+          gid: notification.gig.gid,
+        }),
+      });
+  
+      if (!responsePostUpdate.ok) {
+        console.error('Failed to update post status:', responsePostUpdate.statusText);
+        return;
+      }
+  
       // Call the API to update the customer's notification
       const responseUpdate = await fetch(`http://localhost:3000/api/notifications/${user.uid}/${notification.timestamp}`, {
         method: 'PUT',
@@ -59,7 +93,7 @@ const Notifications = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          text: `You have accepted to let business ${notification.senderId} take on your task!`,
+          text: `You have accepted to let business ${notification.sender.Business.Name} take on your task!`,
           type: 'gig-response-customer',
           timestamp: updatedTimestamp,  // Updating the timestamp
         }),
@@ -104,10 +138,24 @@ const Notifications = () => {
       console.error('Error handling accept click:', error);
     }
   };
+  
 
   const handleDeclineClick = async (notification) => {
     try {
       const updatedTimestamp = Date.now();
+
+      // Call the API to delete the gig
+      const responseGigDelete = await fetch(`http://localhost:3000/api/gigs/${notification.gig.gid}/${notification.sender.uid}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!responseGigDelete.ok) {
+        console.error('Failed to delete gig:', responseGigDelete.statusText);
+        return;
+      }
       
       // Call the API to update the customer's notification
       const responseUpdate = await fetch(`http://localhost:3000/api/notifications/${user.uid}/${notification.timestamp}`, {
@@ -146,7 +194,7 @@ const Notifications = () => {
           body: JSON.stringify({
             receiverId: notification.sender.uid, // The sender of the original notification
             senderId: user.uid,
-            text: `User ${user.uid} has declined your task!`,
+            text: `User ${user.Name} has declined your gig request for ${notification.post.title}!`,
             type: 'gig-decline-business',
           }),
         });

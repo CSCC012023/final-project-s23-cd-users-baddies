@@ -74,8 +74,8 @@ const MyGigs = () => {
           <Button colorScheme="teal" onClick={() => filterPostsByStatus("requested")}>
             Requested
           </Button>
-          <Button colorScheme="red" onClick={() => filterPostsByStatus("pending")}>
-            Pending
+          <Button colorScheme="red" onClick={() => filterPostsByStatus("in-progress")}>
+            In-Progress
           </Button>
           <Button colorScheme="teal" onClick={() => filterPostsByStatus("completed")}>
             Completed
