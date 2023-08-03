@@ -22,8 +22,8 @@ import {
 } from "@chakra-ui/react";
 import io from 'socket.io-client';
 
-// Replace this with the actual URL of your Socket.IO server
-const SERVER_URL = 'http://localhost:3001';
+// const SERVER_URL = 'http://localhost:3000'; // Replace this with the actual URL of your Socket.IO server
+// const socket = io(SERVER_URL)
 
 const SideBar = ({ handleContactSelect }) => {
   const user = useContext(UserContext);
@@ -81,13 +81,13 @@ const SideBar = ({ handleContactSelect }) => {
 const Chat = ({ contact, handleContactSelect }) => {
   const handleClick = () => {
     handleContactSelect(contact); // Make sure `contact` has the `uid` property
-    console.log(contact)
+    // console.log(contact)
   };
 
   return (
     <Flex m="3" p={3} align="center" _hover={{ bg: "teal.400", cursor: "pointer" }} onClick={handleClick}>
       <Avatar src={contact.avatar} />
-      <Text ml="10px">{contact.name}</Text>
+      <Text  ml="10px">{contact.name}</Text>
     </Flex>
   );
 };
@@ -97,7 +97,7 @@ const TopBar = ({ selectedContact }) => {
   return (
     <Flex w="100%" h="20vh" align="center" borderBottom="1px solid" borderColor="#50545c">
       <Avatar mt="10vh" src={selectedContact.avatar} ml="3" />
-      <Text color="white" align="center" justifyContent="space-between" mt="10vh" marginEnd={3} p="3">
+      <Text align="center" justifyContent="space-between" mt="10vh" marginEnd={3} p="3" fontSize='3xl'>
         {selectedContact.name}
       </Text>
     </Flex>
@@ -126,6 +126,7 @@ const BottomBar = ({ handleSendMessage, selectedContact }) => { // Receive `sele
       <Input
         w="70%"
         placeholder="Type a message"
+        borderColor={"blackAlpha.400"}
         value={messageText}
         onChange={(e) => setMessageText(e.target.value)}
         onKeyDown={handleKeyDown} // Attach the handleKeyDown event directly here
@@ -144,6 +145,31 @@ const Messages = ({ selectedUserUid }) => {
   const [selectedContact, setSelectedContact] = useState(null);
   const [chatContacts, setChatContacts] = useState([]);
   const [chatMessagesData, setChatMessagesData] = useState({});
+  
+
+  // console.log('Socket.io connected:', socket.connected);
+
+  useEffect(() => {
+    // Create a socket.io client connection to the backend server
+    const socket = io('http://localhost:3000');
+
+    // Listen for the 'newMessage' event from the server
+    socket.on('newMessage', (data) => {
+      // Update the messages in the state to include the new message
+      setChatMessagesData((prevChatMessages) => ({
+        ...prevChatMessages,
+        [data.senderId]: [
+          ...(prevChatMessages[data.senderId] || []),
+          { text: data.text, sender: { _path: { segments: ['', data.senderId] } } },
+        ],
+      }));
+    });
+    // Clean up the socket connection when the component is unmounted
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
 
   useEffect(() => {
     const fetchChatContacts = async () => {
@@ -182,14 +208,14 @@ const Messages = ({ selectedUserUid }) => {
       );
       if (response.ok) {
         const chatMessagesDataForContact = await response.json();
-        console.log('Fetched messages for', selectedUserUid, ':', chatMessagesDataForContact);
+        // console.log('Fetched messages for', selectedUserUid, ':', chatMessagesDataForContact);
   
         // Update the state with the new messages for the selected contact
         setChatMessagesData((prevChatMessages) => ({
           ...prevChatMessages,
           [selectedUserUid]: chatMessagesDataForContact,
         }));
-         console.log(selectedUserUid)
+        //  console.log(selectedUserUid)
       } else {
         console.error('Error getting chat messages:', response.statusText);
       }
@@ -209,6 +235,7 @@ const Messages = ({ selectedUserUid }) => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ text }),
+          
         }
       );
 
@@ -217,6 +244,7 @@ const Messages = ({ selectedUserUid }) => {
           text,
           // Assume the current user is the sender
           sender: { _path: { segments: ['', user.uid] } },
+
         };
 
         // Update the state with the new message for the selected contact
@@ -227,7 +255,7 @@ const Messages = ({ selectedUserUid }) => {
             newMessage,
           ],
         }));
-        console.log(chatMessagesData);
+        // console.log(chatMessagesData);
       } else {
         console.error('Error sending message:', response.statusText);
       }
@@ -266,11 +294,17 @@ const Messages = ({ selectedUserUid }) => {
 
 
 
+// Messages.js
+
 const Message = ({ message, isCurrentUser }) => {
-  const backgroundColor = isCurrentUser ? "teal.400" : "whiteAlpha.100";
+  const backgroundColor = isCurrentUser ? "teal.400" : "blackAlpha.100";
   const textColor = isCurrentUser ? "white" : "inherit";
   const alignSelf = isCurrentUser ? "flex-end" : "flex-start";
   const marginLeft = isCurrentUser ? "auto" : "unset";
+
+  // Check if message.sender exists before accessing its properties
+  
+  const senderId = message.sender?._path?.segments[1];
 
   return (
     <Flex
@@ -288,6 +322,7 @@ const Message = ({ message, isCurrentUser }) => {
     </Flex>
   );
 };
+
 
 
 export default Messages;
