@@ -9,15 +9,17 @@ const RatingStars = ({ rating }) => {
   const stars = [];
 
   for (let i = 0; i < fullStars; i++) {
-    stars.push(<FaStar key={i} style={{ color: 'yellow' }}  />);
+    stars.push(<FaStar key={i} style={{ color: 'yellow' }} />);
   }
 
   if (hasHalfStar) {
     stars.push(<FaStar key={fullStars} half />);
   }
 
-  for (let i = stars.length; i < totalStars; i++) {
-    stars.push(<FaStar key={i} empty />);
+  const remainingStars = totalStars - fullStars - (hasHalfStar ? 1 : 0);
+
+  for (let i = 0; i < remainingStars; i++) {
+    stars.push(<FaStar key={i + fullStars + (hasHalfStar ? 1 : 0)} style={{ color: 'white' }} />);
   }
 
   return <div style={{ display: 'flex', marginTop: '10px' }}>{stars}</div>;
