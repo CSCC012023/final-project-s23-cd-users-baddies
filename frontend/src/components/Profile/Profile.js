@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
-import { Box, Button, Flex, Image, Input, Text, Select, FormControl, Grid, GridItem } from '@chakra-ui/react';
+import { Box, Button, Flex, Image, Input, Text, Select, FormControl, Grid, GridItem, Avatar } from '@chakra-ui/react';
 import { UserContext } from '../User/UserContext';
 import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, updateDoc } from 'firebase/firestore';
-import ProfilePicture from './Profile pic.jpeg'; 
+// import ProfilePicture from './Profile pic.jpeg'; 
 
 const Profile = () => {
   const user = useContext(UserContext);
@@ -65,7 +65,7 @@ const Profile = () => {
       </Text>
       <Flex align="center" mb={8}>
         <Flex direction="column" mr={6}>
-          <Image src={ProfilePicture} alt="Profile" borderRadius="full" boxSize="200px" />
+          <Avatar src={user.profilePicture} alt="Profile" borderRadius="full" boxSize="200px" />
           <Button mt={4} colorScheme="blue" onClick={handleSave}>
             Save
           </Button>
