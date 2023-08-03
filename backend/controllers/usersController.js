@@ -74,9 +74,23 @@ const updateUserProfile = async (userId, updateFields) => {
   }
 };
 
-// usersController.js
+const getUserClients = async (userId) => {
+  try {
+    const userRef = db.collection('User').doc(userId).collection('PastClients');
+    const clientsSnapshot = await userRef.get();
+    const clients = [];
 
-// ...
+    clientsSnapshot.forEach((doc) => {
+      const client = doc.data();
+      clients.push(client);
+    });
+
+    return clients;
+  } catch (error) {
+    console.error('Error getting user clients:', error);
+    throw new Error('Internal server error');
+  }
+};
 
 // Get services for a specific user
 const getUserServices = async (userId) => {
@@ -93,6 +107,27 @@ const getUserServices = async (userId) => {
   } catch (error) {
     console.error('Error getting user services:', error);
     throw new Error('Internal server error');
+  }
+};
+
+// Delete a service for a user
+const deleteUserService = async (userId, serviceId) => {
+  try {
+    // Get the service document reference
+    const serviceRef = db.collection('User').doc(userId).collection('Services').doc(serviceId);
+
+    // Check if the service exists
+    const serviceDoc = await serviceRef.get();
+    if (!serviceDoc.exists) {
+      throw new Error('Service not found');
+    }
+
+    // Delete the service document
+    await serviceRef.delete();
+
+  } catch (error) {
+    console.error('Error deleting user service:', error);
+    throw error; // Re-throw the error to be handled in the route
   }
 };
 
@@ -143,12 +178,14 @@ const editUserService = async (userId, serviceId, updatedService) => {
   }
 };
 
-module.exports = { 
+module.exports = {
   getAllUsers,
   getUserProfile,
   updateUserProfile,
   getBusinessUsers,
   getUserServices,
+  getUserClients,
   addBusinessUserService,
-  editUserService
+  editUserService,
+  deleteUserService
 };

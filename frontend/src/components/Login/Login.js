@@ -67,11 +67,8 @@ const Login = () => {
   const [postalCode, setPostalCode] = useState('');
   const [location, setLocation] = useState('');
   const [businessName, setBusinessName] = useState('');
-  
-  const [businessDescription, setBusinessDescription] = useState('');
+
   const fileInputRef = useRef(null);
-  const storage = getStorage(app);
-  const [avatarImage, setAvatarImage] = useState('');
   const [businessHours, setBusinessHours] = useState({
     Monday: null,
     Tuesday: null,
