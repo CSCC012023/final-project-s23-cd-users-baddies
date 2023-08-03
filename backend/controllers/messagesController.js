@@ -1,4 +1,9 @@
 const { db } = require('../firebase');
+const { Server } = require('socket.io');
+const http = require('http');
+const { server } = require('../app'); // Import the server instance from app.js
+const io = new Server(server); // Initialize Socket.io with the server instance
+
 
 
 // Function to get all messages between two users
@@ -62,7 +67,7 @@ const getMessagesBetweenUsers = async (user1Id, user2Id) => {
 
 
 // Function to send a message from one user to another
-const sendMessage = async (senderId, receiverId, text) => {
+const sendMessage = async (senderId, receiverId, text, io) => {
   try {
     // Get references to the sender and receiver user documents
     const senderRef = db.collection('User').doc(senderId);
@@ -132,6 +137,8 @@ const sendMessage = async (senderId, receiverId, text) => {
       timestamp: timestamp,
       // Other message data...
     });
+
+    io.emit('newMessage', { senderId, receiverId, text });
 
     return { success: true, message: 'Message sent successfully' };
   } catch (error) {
