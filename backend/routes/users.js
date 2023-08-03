@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices, addBusinessUserService, editUserService } = require('../controllers/usersController');
+const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices, getUserClients, deleteUserService, addBusinessUserService, editUserService } = require('../controllers/usersController');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -15,14 +15,26 @@ router.get('/', async (req, res) => {
 
 // Get business users
 router.get('/businesses', async (req, res) => {
-    try {
-      const businessUsers = await getBusinessUsers();
-      res.json(businessUsers);
-    } catch (error) {
-      console.error('Error getting business users:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+  try {
+    const businessUsers = await getBusinessUsers();
+    res.json(businessUsers);
+  } catch (error) {
+    console.error('Error getting business users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get clients of a User
+router.get('/clients/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userClients = await getUserClients(userId);
+    res.json(userClients);
+  } catch (error) {
+    console.error('Error getting user clients:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Get services for business users
 router.get('/services/:userId', async (req, res) => {
@@ -41,7 +53,7 @@ router.post('/services/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
     const { serviceName, description, price, duration } = req.body;
-    
+
     // Check if the required fields are provided
     if (!serviceName || !description || !price || !duration) {
       return res.status(400).json({ error: 'Service name, description, price and duration are required' });
@@ -62,6 +74,22 @@ router.post('/services/:userId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Delete service for a user
+router.delete('/services/:userId/:serviceId', async (req, res) => {
+  try {
+    const { userId, serviceId } = req.params;
+
+    // Call the function to delete the service
+    await deleteUserService(userId, serviceId);
+
+    res.json({ message: 'Service deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user service:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Edit service fields
 router.put('/services/:userId/:serviceId', async (req, res) => {
@@ -118,5 +146,3 @@ router.put('/profile/:userId', async (req, res) => {
 });
 
 module.exports = router;
-
-
