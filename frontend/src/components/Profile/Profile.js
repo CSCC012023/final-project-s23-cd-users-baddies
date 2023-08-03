@@ -1,5 +1,4 @@
-import React, { useState, useContext, } from 'react';
-import {
+import React, { useContext, useEffect, useState, useRef } from 'react'; import {
   IconButton,
   Box,
   CloseButton,
@@ -14,9 +13,11 @@ import {
   Input,
   Button,
   Select,
-  useToast, Grid, GridItem
+  useToast, Grid, GridItem, Avatar, Center
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
+
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   FiHome,
   FiTrendingUp,
@@ -25,7 +26,7 @@ import {
 } from 'react-icons/fi';
 import { UserContext } from '../User/UserContext';
 import { getAuth, signOut } from 'firebase/auth';
-import { getFirestore, doc, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, updateDoc, setDoc } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
 const DateButton = ({ label, onClick }) => {
@@ -61,6 +62,8 @@ const Profile = () => {
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const fileInputRef = useRef(null);
+  const storage = getStorage(app);
 
   const handleSignOut = () => {
     signOut(auth)
@@ -111,7 +114,7 @@ const Profile = () => {
       },
     };
 
-    await updateDoc(userRef, userData);
+    await updateDoc(userRef, userData,{ merge: true });
 
     toast({
       title: 'Business info saved successfully',
@@ -124,14 +127,64 @@ const Profile = () => {
   function PersonalInfoTab() {
     const [name, setName] = useState(user.Name);
     const [number, setNumber] = useState(user.contactNumber);
-
+    const [avatarImage, setAvatarImage] = useState(user.profilePicture);
     const handleSave = () => {
       handleSavePersonalInfo(name, number);
     };
+    const handleImageUpload = async (event) => {
+      const file = event.target.files[0];
 
+      // Check if the file is an image (JPEG, PNG, GIF)
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        console.log('Please select a valid image file (JPEG, PNG, GIF)');
+        return;
+      }
+      try {
+        // Upload the image to Firebase Storage
+        const storageRef = ref(storage, `avatars/${auth.currentUser.uid}`);
+        const snapshot = await uploadBytes(storageRef, file);
+
+        // Get the download URL of the uploaded image
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        console.log('Download URL:', downloadURL); // Add this line to log the download URL
+
+        // Update the user document in Firestore with the profilePicture field
+        const userDocRef = doc(db, 'User', auth.currentUser.uid);
+        await setDoc(
+          userDocRef,
+          {
+            profilePicture: downloadURL,
+          },
+          { merge: true }
+        );
+
+        console.log('Profile picture updated successfully.'); // Add this line to log success
+
+        // Update the Avatar with the new image
+        setAvatarImage(downloadURL);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    };
     return (
-
       <Flex direction="column" mt="24" mb={8}>
+        <Center>
+          <Avatar
+            bg="blue.300"
+            size="xl"
+            name="Business"
+            src={avatarImage || "path-to-avatar-image"} />
+         
+        </Center>
+        <Button onClick={() => fileInputRef.current.click()}>Upload Picture</Button>
+        <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            onChange={handleImageUpload}
+          />
         <Text fontWeight="bold" mb={2}>
           Full Name
         </Text>
