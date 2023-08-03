@@ -41,8 +41,14 @@ const MyPosts = () => {
   const completePost = async (post) => {
     try {
       const postId = post.pid;
+      const gigId = post.gid; // assuming gid is available in post object
       await axios.put(`http://localhost:3000/api/posts/${postId}`, {
         status: "completed",
+      });
+  
+      // Update gig status
+      await axios.put(`http://localhost:3000/api/gigs/${gigId}`, {
+        newStatus: "completed",
       });
       
       // Update the post status in the local state if necessary
@@ -57,6 +63,7 @@ const MyPosts = () => {
       console.error('Error completing the post:', error);
     }
   };
+  
   
 
   useEffect(() => {
