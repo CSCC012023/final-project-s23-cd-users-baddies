@@ -84,21 +84,25 @@ export class GoogleMapContainer extends Component {
   handleRequestGig = (selectedPost) => {
     const user = this.context;
     applyForGig(selectedPost, user.uid)
-      .then((message) => {
-        console.log(message);
+      .then((result) => {
+        console.log(result.message);
         this.setState((prevState) => ({
           posts: prevState.posts.map((post) =>
             post.pid === selectedPost.pid ? { ...post, isButtonClicked: true } : post
           ),
           selectedPost: { ...selectedPost, isButtonClicked: true },
         }));
-        console.log('this is the reciever id', selectedPost.postedBy);
+        console.log("this is the postedby uid", selectedPost.postedBy.uid);
+        const postedByUid = selectedPost.postedBy.split('/')[2];
+        console.log('this is the pid and gid', selectedPost.pid, result.gid);
         // Create a notification of type 'gig-request' to the post owner
         return createNotification(
-          selectedPost.postedBy.uid, // receiverId: the owner of the post
+          postedByUid, // receiverId: the owner of the post
           user.uid, // senderId: the user who is applying for the gig
-          'A user has requested your gig', // Notification text
-          'gig-request' // Notification type
+          'The Business ${user.Business.Name} has requested your gig', // Notification text
+          'gig-request', // Notification type
+          result.gid, // Gig id
+          selectedPost.pid  // Post id
         );
       })
       .then(() => {
@@ -108,6 +112,7 @@ export class GoogleMapContainer extends Component {
         console.error('Error applying for the gig or sending notification:', error);
       });
   };
+  
   
 
   render() {

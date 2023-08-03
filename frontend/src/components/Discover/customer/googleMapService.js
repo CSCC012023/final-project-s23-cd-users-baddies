@@ -27,7 +27,7 @@ const applyForGig = async (selectedPost, userId) => {
   
       if (response.ok) {
         const result = await response.json();
-        return result.message;
+        return result; // returning entire result
       } else {
         throw new Error('Failed to apply for the gig');
       }
@@ -36,6 +36,7 @@ const applyForGig = async (selectedPost, userId) => {
       throw new Error('Error applying for the gig');
     }
   };
+  
 
 const listenForNewPosts = (onNewPostReceived) => {
   socket.on('newPost', (post) => {
@@ -47,9 +48,11 @@ const listenForNewPosts = (onNewPostReceived) => {
   });
 };
 
-const createNotification = async (receiverId, senderId, text, type) => {
+const createNotification = async (receiverId, senderId, text, type, gid, pid) => {
     console.log('receiverId:', receiverId);
     console.log('senderId:', senderId);
+    console.log('gId:', gid);
+    console.log('pId:', pid);
   
     try {
       const response = await fetch('http://localhost:3000/api/notifications/create', {
@@ -57,7 +60,7 @@ const createNotification = async (receiverId, senderId, text, type) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ receiverId, senderId, text, type }),
+        body: JSON.stringify({ receiverId, senderId, text, type, gigId: gid, postId: pid }),
       });
   
       if (response.ok) {
@@ -71,6 +74,7 @@ const createNotification = async (receiverId, senderId, text, type) => {
       throw new Error('Error creating notification');
     }
   };
+  
   
   const checkIfPostIsRequestedByUser = async (selectedPost, userId) => {
     try {
