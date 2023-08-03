@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Flex, Text, Button, AlertDialog, AlertDialogBody, AlertDialogFooter, AlertDialogHeader, AlertDialogContent, AlertDialogOverlay } from "@chakra-ui/react";
 
-const GigRequestNotificationItem = ({ notification, onMessageButtonClick, onAcceptClick }) => {
+const GigRequestNotificationItem = ({ notification, onMessageButtonClick, onAcceptClick, onDeclineClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [dialogType, setDialogType] = useState('');
   const onClose = () => setIsOpen(false);
@@ -26,7 +26,7 @@ const GigRequestNotificationItem = ({ notification, onMessageButtonClick, onAcce
     if (dialogType === 'accept') {
       onAcceptClick(notification);
     } else {
-      console.log('Decline confirmed for notification:', notification);
+      onDeclineClick(notification);
     }
   };
 
@@ -71,3 +71,4 @@ const GigRequestNotificationItem = ({ notification, onMessageButtonClick, onAcce
 };
 
 export default GigRequestNotificationItem;
+
