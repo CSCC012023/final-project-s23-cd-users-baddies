@@ -127,8 +127,8 @@ const Post = () => {
     const chatCompletion = await openai.createChatCompletion({
       model: "gpt-3.5-turbo",
       messages: [{
-        role: "system", content: "A user is trying to find a good description for a title he will provide you. He's looking for an individual to accomplish what's being done in the title, this is being posted to platform where users can post a gig and businesses can pick it up. Simply respond with the better description, or a new one if no description is provided, nothing else."
-      }, { role: "user", content: `Hey, can you give me a better description, my current description is:,  and my title is Someone to mow my lawn` }, { role: "assistant", content: 'Need someone reliable and efficient for regular lawn mowing at my property. Please reach out if you\'re a skilled lawn care provider.' }, { role: "user", content: `Hey, can you give me a better description, my current description is: ${description},  and my title is ${title}` }],
+        role: "system", content: "A user is trying to find a good description for a title he will provide you. He's posting a gig to look for someone to help him with a service, for example he might want someone to mow his lawn or clean up his driveway"
+      }, { role: "user", content: `Hey, can you give me a better description, my current description is:,  and my title is Someone to mow my lawn` }, { role: "assistant", content: 'Looking for someone for regular lawn mowing at my property. Please reach out if you\'re a skilled lawn care provider.' }, { role: "user", content: `Hey, can you give me a better description, my current description is: ${description},  and my title is ${title}` }],
     });
     setDescription(chatCompletion.data.choices[0].message.content)
     console.log(chatCompletion.data.choices[0].message.content);
@@ -149,7 +149,7 @@ const Post = () => {
           justifyContent="center"
           alignItems="center"
         >
-          <Heading color="teal.400">Need a service? Make a post!</Heading>
+          <Heading >Need a service? Make a post!</Heading>
           <Stack
             p="1rem"
             // backgroundColor="whiteAlpha.900"
@@ -225,7 +225,6 @@ const Post = () => {
               borderRadius={0}
               type="submit"
               variant="solid"
-              colorScheme="teal"
               mt='5%'
 
             >
