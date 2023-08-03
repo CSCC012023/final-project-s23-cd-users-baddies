@@ -131,7 +131,7 @@ const MyPosts = () => {
     
     {posts.filter((post) => post.status === filteredStatus).length > 0 && (
       <div className="post-container">
-        <Box display="flex" flexWrap="wrap">
+        <Box display="flex" flexWrap="wrap" justifyContent="center" marginTop="60">
           {posts
             .filter((post) => post.status === filteredStatus)
             .map((post) => (
