@@ -1,193 +1,313 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
+import {
+  ChakraProvider,
+  Textarea,
+  Drawer,
+  DrawerContent,
+  Box,
+  Text,
+  Heading,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+  FormErrorMessage,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  useDisclosure,
+  VStack,
+  Flex,
+  Icon,
+  IconButton,
+  CloseButton,
+} from '@chakra-ui/react'; import { FiHome, FiUsers, FiStar, FiCalendar } from 'react-icons/fi';
 import { UserContext } from '../User/UserContext';
-import { Box, Button, Flex, FormControl, FormLabel, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Textarea, VStack, useDisclosure } from '@chakra-ui/react';
 import axios from 'axios';
-import SimpleSidebar from './SideBarNav';
 import ServiceCard from './ServiceCard/ServiceCard';
-import Schedule from './Schedule/Schedule';
-import Statistics from './Statistics/Statistics'
-import Reviews from './Reviews/Reviews';
-import Clients from './Clients/Clients'
-
+import ClientCard from './Clients/Clients';
 
 
 const MyBusiness = () => {
-  const user = useContext(UserContext);
-  const [businessName, setBusinessName] = useState('');
-  const [businessDescription, setBusinessDescription] = useState('');
-  const [services, setServices] = useState([]);
-  const [activeTab, setActiveTab] = useState('Services');
 
+  const LinkItems = [
+    { name: 'Services', icon: FiHome, content: ServicesTab },
+    { name: 'Schedule', icon: FiCalendar, content: ScheduleTab },
+    { name: 'Clients', icon: FiUsers, content: ClientsTab },
+    { name: 'Reviews', icon: FiStar, content: ReviewsTab },
+  ];
+
+  const user = useContext(UserContext);
+  const [activeTab, setActiveTab] = useState(0);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const [newService, setNewService] = useState({
-    serviceName: '',
-    description: '',
-    price: '',
-    duration: '',
-  });
+  // Function for handling the navigation items in the sidebar
+  function NavItem({ icon, children, onClick, ...rest }) {
+    return (
+      <Box
+        as="button"
+        style={{ textDecoration: 'none' }}
+        _focus={{ boxShadow: 'none' }}
+        onClick={onClick}
+      >
+        <Flex
+          align="center"
+          p="4"
+          mx="4"
+          borderRadius="lg"
+          role="group"
+          cursor="pointer"
+          _hover={{
+            bg: 'cyan.400',
+            color: 'white',
+          }}
+          {...rest}
+        >
+          {icon && (
+            <Icon
+              mr="4"
+              fontSize="16"
+              _groupHover={{
+                color: 'white',
+              }}
+              as={icon}
+            />
+          )}
+          {children}
+        </Flex>
+      </Box>
+    );
+  }
 
-  const handleFormInputChange = (event) => {
-    const { name, value } = event.target;
-    setNewService({ ...newService, [name]: value });
-  };
+  // Function for rendering the sidebar content
+  function SidebarContent({ onClose, ...rest }) {
+    const user = useContext(UserContext);
+    const userType = user.userType;
 
-  const fetchUserServices = async () => {
-    try {
-      const response = await axios.get(`http://localhost:3000/api/users/services/${user.uid}`);
-      const userServices = response.data;
-      setServices(userServices);
-    } catch (error) {
-      console.error('Error fetching user services:', error);
-    }
-  };
+    return (
+      <Box
+        borderRight="1px"
+        w={{ base: 'full', md: 60 }}
+        pos="fixed"
+        h="full"
+        {...rest}
+      >
+        <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+            Logo
+          </Text>
+          <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
+        </Flex>
+        {LinkItems.map((link, index) => {
+          if (link.isBusiness && userType !== 'business') {
+            return null;
+          }
 
+          return (
+            <NavItem key={index} icon={link.icon} onClick={() => setActiveTab(index)}>
+              {link.name}
+            </NavItem>
+          );
+        })}
+      </Box>
+    );
+  }
 
-  const handleAddService = async () => {
-    try {
+  function ServicesTab() {
+    const [services, setServices] = useState([]);
+    const [newService, setNewService] = useState({
+      serviceName: '',
+      description: '',
+      price: '',
+      duration: '',
+    });
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const user = useContext(UserContext);
 
-      const response = await axios.post(`http://localhost:3000/api/users/services/${user.uid}`, newService);
-      console.log(response.data); // Log the response from the backend (optional)
-      onClose();
+    useEffect(() => {
       fetchUserServices();
+    }, []);
 
-    } catch (error) {
-
-      console.error('Error adding service:', error);
-      
-    }
-  };
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        // Make a request to fetch the user profile using the provided API route for getting the profile by userID
-        const response = await axios.get(`http://localhost:3000/api/users/profile/${user.uid}`);
-        const userProfile = response.data;
-
-        if (userProfile.userType === 'business' && userProfile.Business) {
-        } else {
-          setBusinessName('Not a business');
-          setBusinessDescription('');
-        }
-      } catch (error) {
-        console.error('Error fetching user profile:', error);
-      }
+    const fetchUserServices = async () => {
       try {
         const response = await axios.get(`http://localhost:3000/api/users/services/${user.uid}`);
-        const userServices = response.data;
-        setServices(userServices);
+        setServices(response.data);
       } catch (error) {
-        console.error('Error fetching user services:', error);
+        console.error('Error fetching services:', error);
       }
     };
 
-    fetchUserProfile();
-  }, [user.uid]);
+    const handleAddService = async () => {
+      try {
+        const response = await axios.post(`http://localhost:3000/api/users/services/${user.uid}`, newService);
+        console.log(response.data);
+        onClose();
+        fetchUserServices();
+      } catch (error) {
+        console.error('Error adding service:', error);
+      }
+    };
+
+    const handleFormInputChange = (event) => {
+      const { name, value } = event.target;
+      setNewService({ ...newService, [name]: value });
+    };
+
+    return (
+      <Box>
+        <Box mt="90px">
+          <Flex flexWrap="wrap" justifyContent="flex-start">
+            {services.map((service) => (
+              <ServiceCard
+                key={service.serviceId}
+                user={user}
+                serviceId={service.serviceId}
+                name={service.serviceName}
+                description={service.description}
+                price={service.price}
+                duration={service.duration}
+                onDeleteService={fetchUserServices}
+              />
+            ))}
+          </Flex>
+        </Box>
+        <Box position="fixed" bottom="4" right="4">
+          {/* Add Service Button */}
+          <Button onClick={onOpen} colorScheme="blue">
+            Add Service
+          </Button>
+        </Box>
+
+        {/* Add Service Modal */}
+        <Modal isOpen={isOpen} onClose={onClose}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalHeader>Add Service</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <VStack spacing={4}>
+                <FormControl>
+                  <FormLabel>Service Name</FormLabel>
+                  <Input
+                    type="text"
+                    name="serviceName"
+                    value={newService.serviceName}
+                    onChange={handleFormInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Description</FormLabel>
+                  <Textarea
+                    name="description"
+                    value={newService.description}
+                    onChange={handleFormInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Price</FormLabel>
+                  <Input
+                    type="number"
+                    name="price"
+                    value={newService.price}
+                    onChange={handleFormInputChange}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel>Duration</FormLabel>
+                  <Input
+                    type="text"
+                    name="duration"
+                    value={newService.duration}
+                    onChange={handleFormInputChange}
+                  />
+                </FormControl>
+              </VStack>
+            </ModalBody>
+            <ModalFooter>
+              <Button variant="ghost" mr={3} onClick={onClose}>
+                Close
+              </Button>
+              <Button colorScheme="blue" onClick={handleAddService}>
+                Add
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </Box>
+    );
+  }
+
+  function ScheduleTab() {
+
+  }
+
+  function ClientsTab() {
+    const [clients, setClients] = useState([]);
+    const [newClient, setNewClient] = useState({
+      clientName: '',
+      lastDealTimestamp: '',
+    });
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const user = useContext(UserContext);
+
+    useEffect(() => {
+      fetchUserClients();
+    }, []);
+
+    const fetchUserClients = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/users/clients/${user.uid}`);
+        setClients(response.data);
+      } catch (error) {
+        console.error('Error fetching clients:', error);
+      }
+    };
+
+    return (
+      <Box>
+        <Box mt="90px">
+          <Flex flexWrap="wrap" justifyContent="flex-start">
+            {clients.map((client) => (
+              <ClientCard/>
+            ))}
+          </Flex>
+        </Box>
+        <Box position="fixed" bottom="4" right="4">
+        </Box>
+      </Box>
+    );
+  }
+
+
+  function ReviewsTab() {
+
+  }
 
   return (
-    <div>
-      <Flex>
-        <SimpleSidebar activeTab={activeTab} handleTabClick={setActiveTab} />
-        <Box ml="20px">
-          {/* Render different content based on the active tab */}
-          {activeTab === 'Services' ? (
-            <Box mt="100px" display="flex" flexWrap="wrap">
-              {services.map((service, index) => (
-                <ServiceCard
-                  key={index}
-                  name={service.serviceName}
-                  description={service.description}
-                  price={service.price}
-                  duration={service.duration}
-                />
-              ))}
-            </Box>
-          ) : activeTab === 'Schedule' ? (
-            <Schedule />
-          ) : activeTab === 'Statistics' ? (
-            <Statistics />
-          ) : activeTab === 'Clients' ? (
-            <Clients />
-          ) : activeTab === 'Reviews' ? (
-            <Reviews />
-          ) : (
-            <Box>
-              {/* Render a default content or leave this section empty */}
-            </Box>
-          )}
-        </Box>
-      </Flex>
-      {/* Add Service Button */}
-      {activeTab === 'Services' && (
-        <Button
-          onClick={onOpen}
-          position="fixed"
-          bottom="40px"
-          right="40px"
-          colorScheme="blue"
-          size="lg"
-        >
-          Add Service
-        </Button>
-      )}
+    <Box minH="100vh">
+      <SidebarContent onClose={onClose} display={{ base: 'none', md: 'block' }} />
+      <Drawer
+        isOpen={isOpen}
+        placement="left"
+        onClose={onClose}
+        returnFocusOnClose={false}
+        onOverlayClick={onClose}
+        size="full"
+      >
+        <DrawerContent>
+          <SidebarContent onClose={onClose} />
+        </DrawerContent>
+      </Drawer>
 
-      {/* Modal for adding a new service */}
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add Service</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <VStack spacing={4}>
-              <FormControl>
-                <FormLabel>Service Name</FormLabel>
-                <Input
-                  type="text"
-                  name="serviceName"
-                  value={newService.serviceName}
-                  onChange={handleFormInputChange}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Description</FormLabel>
-                <Textarea
-                  name="description"
-                  value={newService.description}
-                  onChange={handleFormInputChange}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Price</FormLabel>
-                <Input
-                  type="number"
-                  name="price"
-                  value={newService.price}
-                  onChange={handleFormInputChange}
-                />
-              </FormControl>
-              <FormControl>
-                <FormLabel>Duration</FormLabel>
-                <Input
-                  type="text"
-                  name="duration"
-                  value={newService.duration}
-                  onChange={handleFormInputChange}
-                />
-              </FormControl>
-            </VStack>
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button colorScheme="blue" onClick={handleAddService}>
-              Add
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </div>
+      <Box ml={{ base: 0, md: 60 }} p="4">
+        {activeTab < LinkItems.length && React.createElement(LinkItems[activeTab].content)}
+      </Box>
+    </Box>
   );
 };
 
