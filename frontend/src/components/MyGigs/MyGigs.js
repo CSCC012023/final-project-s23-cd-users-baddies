@@ -88,7 +88,7 @@ const MyGigs = () => {
 
       {gigs.filter((gig) => gig.status === filteredStatus).length > 0 && (
         <div className="post-container">
-          <Box display="flex" flexWrap="wrap">
+          <Box display="flex" flexWrap="wrap" justifyContent="center" marginTop="60">
             {gigs
               .filter((gig) => gig.status === filteredStatus)
               .map((gig) => (
