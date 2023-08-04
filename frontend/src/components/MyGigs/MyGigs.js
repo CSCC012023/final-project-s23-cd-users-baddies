@@ -6,23 +6,13 @@ import {
   Stack,
   Heading,
   Text,
-  ButtonGroup,
-  CardBody,
-  CardFooter,
   Button,
   Box,
   Divider,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure 
+  useDisclosure
 } from "@chakra-ui/react";
 import axios from 'axios';
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection, doc, getDoc } from "firebase/firestore";
 
 const db = getFirestore(); // Assume Firebase is already initialized
 
@@ -35,18 +25,16 @@ const MyGigs = () => {
     setFilteredStatus(status);
   };
 
-
   useEffect(() => {
     const fetchUserGigs = async () => {
       try {
-
         const response = await axios.get(`http://localhost:3000/api/gigs/users/${user.uid}/gigs`);
         const gigsData = await Promise.all(
           response.data.map(async (gig) => {
-            // console.log(gig)
-            // console.log(post);
-            // console.log(gig.post.title);
-            return { ...gig};
+            const postRef = doc(db, gig.post._path.segments[0], gig.post._path.segments[1]);
+            const postSnapshot = await getDoc(postRef);
+            const postData = postSnapshot.data();
+            return { ...gig, post: postData };
           })
         );
         setGigs(gigsData);
@@ -57,8 +45,8 @@ const MyGigs = () => {
     fetchUserGigs()
   }, [user.uid]);
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <div>
       <Box
@@ -94,52 +82,17 @@ const MyGigs = () => {
               .map((gig) => (
                 <Card key={gig.id} maxW="sm" flex="none" width="250px" m={6}>
                   <Box borderWidth={1} borderRadius="lg" overflow="hidden">
-                    <CardBody>
-                      <Stack mt="6" spacing="4">
-                        <Heading size="lg">Gig GID: {gig.gid}</Heading>
-                        <Text fontSize="lg">Status: {gig.status}</Text>
-                        <Text color="blue.600" fontSize="xl">
-                          Post ID: {gig.post._path.segments[1]}
-                        </Text>
-                      </Stack>
-                    </CardBody>
+                    <Box p={4}>
+                      <Heading size="lg">Title: {gig.post.title}</Heading>
+                      <Text fontSize="sm" mb={1}>Status: {gig.status}</Text>
+                      <Text fontSize="sm" mb={1}>Title: {gig.post.title}</Text>
+                      <Text fontSize="sm" mb={1}>Description: {gig.post.description}</Text>
+                      <Text fontSize="sm" mb={1}>Price: ${gig.post.price}</Text>
+                    </Box>
                     <Divider />
-                    <CardFooter>
-                      {/* <ButtonGroup spacing="2" margin="10px" >
-                        <Button onClick={onOpen} variant="solid" colorScheme="blue" ml={gig.status === "requested" || gig.status === "completed" ? "50px" : "flex-start"} >
-                          Details
-                        </Button>
-                        <Modal isOpen={isOpen} onClose={onClose}>
-                          <ModalOverlay />
-                          <ModalContent
-                            position="absolute"
-                            top="25%"
-                            transform="translate(-50%, -50%)"
-                            maxW="80%" // Optional: Set the maximum width of the modal
-                            width="fit-content" // Optional: Adjust the width based on the modal content
-                          >
-                            <ModalHeader>{gig.title}</ModalHeader>
-                            <ModalCloseButton />
-                            <ModalBody>
-                              <Text>Description: {gig.post.title}</Text>
-                              <Text>GID: {gig.gid}</Text>
-                              <Text>Post: ${gig.post.title}</Text>
-                            </ModalBody>
-
-                            <ModalFooter>
-                              <Button colorScheme='blue' mr={3} onClick={onClose}>
-                                Close
-                              </Button>
-                            </ModalFooter>
-                          </ModalContent>
-                        </Modal>
-                        {gig.status === "requested" && (
-                          <Button variant="solid" colorScheme="teal">
-                            Complete
-                          </Button>
-                        )}
-                      </ButtonGroup> */}
-                    </CardFooter>
+                    <Box p={4}>
+                      {/* Place additional buttons or actions here */}
+                    </Box>
                   </Box>
                 </Card>
               ))}
