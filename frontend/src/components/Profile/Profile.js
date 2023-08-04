@@ -8,12 +8,12 @@ import React, { useContext, useEffect, useState, useRef } from 'react'; import {
   Drawer,
   DrawerContent,
   useDisclosure,
-  Spacer,
+  Heading,
   VStack,
   Input,
   Button,
   Select,
-  useToast, Grid, GridItem, Avatar, Center
+  useToast, Grid, FormControl, Avatar, Center, FormLabel, Textarea
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons'
 
@@ -23,10 +23,11 @@ import {
   FiTrendingUp,
   FiStar,
   FiMenu,
+  FiAtSign, FiBookOpen
 } from 'react-icons/fi';
 import { UserContext } from '../User/UserContext';
 import { getAuth, signOut } from 'firebase/auth';
-import { getFirestore, doc, updateDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, updateDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
 const DateButton = ({ label, onClick }) => {
@@ -42,6 +43,8 @@ const Profile = () => {
   const LinkItems = [
     { name: 'Personal Info', icon: FiHome, content: PersonalInfoTab },
     { name: 'Business Info', icon: FiTrendingUp, content: BusinessInfoTab, isBusiness: true },
+    { name: 'Support', icon: FiAtSign, content: SupportTab },
+    { name: 'Privacy Policy', icon: FiBookOpen, content: PrivacyPolicyTab },
     { name: 'Logout', icon: FiStar, content: LogoutTab },
   ];
   const user = useContext(UserContext);
@@ -114,7 +117,7 @@ const Profile = () => {
       },
     };
 
-    await updateDoc(userRef, userData,{ merge: true });
+    await updateDoc(userRef, userData, { merge: true });
 
     toast({
       title: 'Business info saved successfully',
@@ -176,15 +179,15 @@ const Profile = () => {
             size="xl"
             name="Business"
             src={avatarImage || "path-to-avatar-image"} />
-         
+
         </Center>
         <Button onClick={() => fileInputRef.current.click()}>Upload Picture</Button>
         <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            onChange={handleImageUpload}
-          />
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleImageUpload}
+        />
         <Text fontWeight="bold" mb={2}>
           Full Name
         </Text>
@@ -390,6 +393,111 @@ const Profile = () => {
       </Flex>
     );
   }
+  function SupportTab() {
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
+    const [description, setDescription] = useState('');
+    const toast = useToast();
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      try {
+        const docRef = await addDoc(collection(db, 'Support'), {
+          email,
+          name,
+          description,
+          createdAt: serverTimestamp(),
+        });
+
+        toast({
+          title: 'Support ticket created',
+          description: `Ticket ID: ${docRef.id}`,
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        });
+
+        setEmail('');
+        setName('');
+        setDescription('');
+      } catch (error) {
+        console.error('Error creating support ticket: ', error);
+        toast({
+          title: 'An error occurred',
+          description: 'Failed to create support ticket. Please try again later.',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    };
+
+    return (
+      <Flex direction="column" mt="24">
+        <form onSubmit={handleSubmit}>
+          <FormControl id="email" isRequired>
+            <FormLabel>Email</FormLabel>
+            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </FormControl>
+          <FormControl id="name" mt={4} isRequired>
+            <FormLabel>Name</FormLabel>
+            <Input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+          </FormControl>
+          <FormControl id="description" mt={4} isRequired>
+            <FormLabel>Description</FormLabel>
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+          </FormControl>
+          <Button type="submit" mt={4} colorScheme="blue">
+            Submit
+          </Button>
+        </form>
+      </Flex>
+    );
+  }
+  function PrivacyPolicyTab() {
+    return (
+      <Box mt="24">
+        <Heading as="h2" size="xl" mb={4}>
+          Privacy Policy
+        </Heading>
+        <Text>
+          At BizReach, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard
+          your information when you use our platform.
+        </Text>
+        <Text mt={4}>
+          <strong>Information we collect:</strong> When you use BizReach, we may collect certain personally identifiable information
+          from you, including your name, email address, phone number, and location. We also collect non-personal information like
+          browsing activity and device information.
+        </Text>
+        <Text mt={4}>
+          <strong>How we use your information:</strong> We may use the information we collect from you to provide and improve our
+          services, respond to customer inquiries and support requests, personalize user experiences, and more.
+        </Text>
+        <Text mt={4}>
+          <strong>How we disclose your information:</strong> We may share your information with third-party service providers who
+          help us with various aspects of our operations. We may also disclose your information if required by law or to protect our
+          rights or the rights of others.
+        </Text>
+        <Text mt={4}>
+          <strong>How we protect your information:</strong> We have implemented appropriate security measures to protect your
+          information from unauthorized access, alteration, and disclosure.
+        </Text>
+        <Text mt={4}>
+          <strong>Third-party websites:</strong> Our platform may contain links to third-party websites. We have no control over
+          and are not responsible for the privacy practices of such websites.
+        </Text>
+        <Text mt={4}>
+          <strong>Updates to the Privacy Policy:</strong> We may update our Privacy Policy from time to time. Any changes will be
+          posted on this page.
+        </Text>
+        <Text mt={4}>
+          By using BizReach, you consent to our Privacy Policy and agree to its terms. If you have any questions or concerns about
+          our Privacy Policy, please contact us.
+        </Text>
+      </Box>
+    );
+  }
 
   function SidebarContent({ onClose, ...rest }) {
     const user = useContext(UserContext);
@@ -437,6 +545,7 @@ const Profile = () => {
           p="4"
           mx="4"
           borderRadius="lg"
+          fontSize="20"
           role="group"
           cursor="pointer"
           _hover={{
