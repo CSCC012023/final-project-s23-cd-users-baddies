@@ -11,6 +11,7 @@ import {
   CardFooter,
   Button,
   Box,
+  Center,
   Divider,
   Modal,
   ModalOverlay,
@@ -23,6 +24,7 @@ import {
   FormControl,
   FormLabel,
   Input,
+  Image,
   Textarea 
 } from "@chakra-ui/react";
 import axios from 'axios';
@@ -193,6 +195,8 @@ const MyPosts = () => {
                           <Text>Description: {selectedPost?.description}</Text>
                           <Text>Location: {selectedPost?.address}</Text>
                           <Text>Price: ${selectedPost?.price}</Text>
+                  
+
                         </ModalBody>
 
                         <ModalFooter>

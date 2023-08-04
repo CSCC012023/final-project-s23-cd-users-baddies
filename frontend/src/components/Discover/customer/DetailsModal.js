@@ -10,8 +10,9 @@ const DetailsModal = ({ post, isOpen, onClose }) => {
         <ModalCloseButton />
         <ModalBody>
           <Image
+            height="150px"
             borderRadius="md"
-            src={bizimg} // Replace with your post image URL
+            src={post.postPic} // Replace with your post image URL
             alt={post.title}
           />
           <VStack align="start" spacing={3} mt={4}>
