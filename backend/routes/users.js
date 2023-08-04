@@ -52,7 +52,7 @@ router.get('/services/:userId', async (req, res) => {
 router.post('/services/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const { serviceName, description, price, duration } = req.body;
+    const { serviceName, description, price, duration, servicePic} = req.body;
 
     // Check if the required fields are provided
     if (!serviceName || !description || !price || !duration) {
@@ -63,7 +63,8 @@ router.post('/services/:userId', async (req, res) => {
       serviceName,
       description,
       price,
-      duration
+      duration,
+      servicePic
     };
 
     await addBusinessUserService(userId, newService);
@@ -95,7 +96,7 @@ router.delete('/services/:userId/:serviceId', async (req, res) => {
 router.put('/services/:userId/:serviceId', async (req, res) => {
   try {
     const { userId, serviceId } = req.params;
-    const { serviceName, description, price, duration } = req.body;
+    const { serviceName, description, price, duration,} = req.body;
 
     // Check if the required fields are provided
     if (!serviceName || !description || !price || !duration) {
