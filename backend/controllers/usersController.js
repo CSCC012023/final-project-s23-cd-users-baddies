@@ -178,6 +178,30 @@ const editUserService = async (userId, serviceId, updatedService) => {
   }
 };
 
+const upsertUserClient = async (userId, clientId, lastDeal) => {
+  try {
+    const userRef = db.collection('User').doc(userId);
+    const pastClientsRef = userRef.collection('PastClients');
+    const clientRef = db.collection('User').doc(clientId); // client reference
+
+    // Query to find if the client already exists
+    const querySnapshot = await pastClientsRef.where('client', '==', clientRef).get();
+    
+    if (!querySnapshot.empty) {
+      // Client found, update the 'lastDeal' field
+      const docRef = querySnapshot.docs[0].ref; // get document reference of the client
+      await docRef.update({ lastDeal });
+    } else {
+      // Client not found, create new document
+      await pastClientsRef.add({ client: clientRef, lastDeal });
+    }
+  } catch (error) {
+    console.error('Error upserting user client:', error);
+    throw error; // Re-throw the error to be handled in the route
+  }
+};
+
+
 module.exports = {
   getAllUsers,
   getUserProfile,
@@ -187,5 +211,6 @@ module.exports = {
   getUserClients,
   addBusinessUserService,
   editUserService,
-  deleteUserService
+  deleteUserService,
+  upsertUserClient
 };
