@@ -61,37 +61,39 @@ const DiscoverBusinesses = () => {
       </Text>
 
       {/* Grid */}
-      <Grid templateColumns="repeat(3, 1fr)" gap="4">
-        {currentBusinesses.map((business, index) => (
-          <GridItem key={business.uid} row={getGridRow(index)} col={getGridColumn(index)}>
-            <Box
-              maxW="400px"
-              borderWidth="1px"
-              borderRadius="lg"
-              overflow="hidden"
-              boxShadow="lg"
-              p="4"
-            >
-              <Center>
-                <Image h="200px" src={business.profilePicture || bisimg} alt={business.Name} />
-              </Center>
-              <Box p="6">
-                <Box d="flex" alignItems="baseline">
-                  <Text fontWeight="semibold" fontSize="xl">
-                    {business.Business?.Name}
-                  </Text>
+      <Center>
+        <Grid templateColumns="repeat(3, 1fr)" gap="4">
+          {currentBusinesses.map((business, index) => (
+            <GridItem key={business.uid} row={getGridRow(index)} col={getGridColumn(index)}>
+              <Box
+                maxW="350px"
+                borderWidth="1px"
+                borderRadius="lg"
+                overflow="hidden"
+                boxShadow="lg"
+                p="4"
+              >
+                <Center>
+                  <Image h="120px" src={business.profilePicture || bisimg} alt={business.Name} />
+                </Center>
+                <Box p="6">
+                  <Box d="flex" alignItems="baseline">
+                    <Text fontWeight="semibold" fontSize="xl">
+                      {business.Business?.Name}
+                    </Text>
+                  </Box>
+                  <Box mt="1" fontSize="sm">
+                    Location: {business.Location}
+                  </Box>
+                  <Button mt="2" colorScheme="blue" onClick={() => handleBusinessClick(business)}>
+                    Details
+                  </Button>
                 </Box>
-                <Box mt="1" fontSize="sm">
-                  Location: {business.Location}
-                </Box>
-                <Button mt="2" colorScheme="blue" onClick={() => handleBusinessClick(business)}>
-                  Details
-                </Button>
               </Box>
-            </Box>
-          </GridItem>
-        ))}
-      </Grid>
+            </GridItem>
+          ))}
+        </Grid>
+      </Center>
 
       {/* Next and Previous Buttons */}
       <Box mt="4" textAlign="center">
