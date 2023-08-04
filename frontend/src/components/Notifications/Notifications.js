@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../User/UserContext';
-import { Flex, Text, Box, Spacer, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalFooter, ModalBody, Input, useColorModeValue, VStack, Heading, IconButton } from "@chakra-ui/react";
+import { Flex, Text, Box, Spacer, Button, Modal, ModalOverlay, ModalContent, ModalHeader, ModalCloseButton, ModalFooter, ModalBody, Input, useColorModeValue, VStack, Heading, IconButton, useToast } from "@chakra-ui/react";
 import { IoMdNotifications } from 'react-icons/io';
 import NotificationItem from './NotificationItem';
 import GigRequestNotificationItem from './GigRequestNotificationItem';
@@ -11,6 +11,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [messageText, setMessageText] = useState('');
+  const toast = useToast();
 
   const bg = useColorModeValue("gray.100", "gray.700");
 
@@ -39,10 +40,29 @@ const Notifications = () => {
 
   const handleSendMessage = async () => {
     try {
-      // Make an API request here to send the message using selectedNotification.senderId and messageText
+      const response = await fetch(`http://localhost:3000/api/messages/${user.uid}/${selectedNotification.sender.uid}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: messageText,
+        }),
+      });
 
-      setSelectedNotification(null);
-      setMessageText('');
+      if (response.ok) {
+        toast({
+          title: "Message Sent.",
+          description: "Your message has been sent successfully.",
+          status: "success",
+          duration: 9000,
+          isClosable: true,
+        });
+        setSelectedNotification(null);
+        setMessageText('');
+      } else {
+        console.error('Failed to send message:', response.statusText);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
     }
