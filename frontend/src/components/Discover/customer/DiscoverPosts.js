@@ -1,15 +1,17 @@
 import React from 'react';
+import { Box, Heading, Container } from '@chakra-ui/react';
 import GoogleMapContainer from './GoogleMap';
-import './Discover.css';
 
 const DiscoverPosts = () => {
   return (
-    <div className="bodyy">
-      <h1 className="title">Discover</h1>
-      <div className="map">
+    <Container maxW="container.xl" py={6}>
+      <Heading as="h1" mb={6} textAlign="center">
+        Discover
+      </Heading>
+      <Box boxShadow="xl" p={5} rounded="md" bg="white" marginTop="10%">
         <GoogleMapContainer />
-      </div>
-    </div>
+      </Box>
+    </Container>
   );
 };
 
