@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices, getUserClients, deleteUserService, addBusinessUserService, editUserService } = require('../controllers/usersController');
+const { getAllUsers, getUserProfile, updateUserProfile, getBusinessUsers, getUserServices, getUserClients, deleteUserService, addBusinessUserService, editUserService, upsertUserClient } = require('../controllers/usersController');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -144,5 +144,26 @@ router.put('/profile/:userId', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+
+router.post('/manage-clients/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { clientId, lastDeal } = req.body;
+
+    // Check if the required fields are provided
+    if (!clientId || !lastDeal) {
+      return res.status(400).json({ error: 'Client ID and last deal timestamp are required' });
+    }
+
+    await upsertUserClient(userId, clientId, lastDeal);
+
+    res.json({ message: 'Client managed successfully' });
+  } catch (error) {
+    console.error('Error managing client:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 module.exports = router;

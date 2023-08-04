@@ -41,3 +41,7 @@
   margin: 0 auto;
   padding: 10px 20px;
 }
+
+.my-modal .modal-backdrop {
+  background: rgba(142, 142, 142, 0.75); 
+}

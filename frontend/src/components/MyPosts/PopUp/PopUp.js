@@ -23,6 +23,7 @@ const PopUpModal = (props) => {
       dialogClassName="my-modal-dialog"
       aria-labelledby="contained-modal-title-vcenter"
       centered
+      className="my-modal"
     >
       <Modal.Header closeButton className="modal-header">
         <Modal.Title id="contained-modal-title-vcenter" className="modal-title">

@@ -1,19 +1,37 @@
 import React, { useState, useContext, useEffect } from 'react';
 import {
+  ChakraProvider,
+  Textarea,
   Drawer,
   DrawerContent,
   Box,
   Text,
+  Heading,
+  Button,
+  Input,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+  FormErrorMessage,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
   useDisclosure,
+  VStack,
   Flex,
   Icon,
+  IconButton,
   CloseButton,
 } from '@chakra-ui/react'; import { FiHome, FiUsers, FiStar, FiCalendar } from 'react-icons/fi';
 import { UserContext } from '../User/UserContext';
 import ReviewsTab from './Reviews/Reviews';
 import ServicesTab from './Services/Services';
 import axios from 'axios';
-import ServiceCard from './ServiceCard/ServiceCard';
+import ServiceCard from './Services/ServiceCard';
 import ClientCard from './Clients/Clients';
 
 
@@ -23,7 +41,7 @@ const MyBusiness = () => {
     { name: 'Services', icon: FiHome, content: ServicesTab },
     { name: 'Schedule', icon: FiCalendar, content: ScheduleTab },
     { name: 'Clients', icon: FiUsers, content: ClientsTab },
-    { name: 'My Reviews', icon: FiStar, content: ReviewsTab },
+    { name: 'My Reviews', icon: FiStar,  content: ReviewsTab},
   ];
 
   const [activeTab, setActiveTab] = useState(0);
@@ -263,11 +281,6 @@ const MyBusiness = () => {
         </Box>
       </Box>
     );
-  }
-
-
-  function ReviewsTab() {
-
   }
 
   return (
