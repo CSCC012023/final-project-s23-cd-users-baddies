@@ -89,7 +89,7 @@ const Post = () => {
             const downloadURL = await getDownloadURL(storageRef);
       
             // Set the postPic to the download URL
-            const postPic = downloadURL;
+            const postPic = avatarImage;
           
 
           
@@ -154,6 +154,7 @@ const Post = () => {
 
       // Set the avatarImage state to the download URL
       setAvatarImage(downloadURL);
+      console.log(downloadURL)
     } catch (error) {
       console.error('Error uploading image:', error);
     }
