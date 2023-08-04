@@ -149,7 +149,7 @@ const Notifications = () => {
           body: JSON.stringify({
             receiverId: notification.sender.uid, // The sender of the original notification
             senderId: user.uid,
-            text: `User ${user.uid} has accepted your task!`,
+            text: `User ${user.Name} has accepted your task!`,
             type: 'gig-response-business',
           }),
         });
