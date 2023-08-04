@@ -107,7 +107,7 @@ export class GoogleMapContainer extends Component {
         return createNotification(
           postedByUid, // receiverId: the owner of the post
           user.uid, // senderId: the user who is applying for the gig
-          'The Business ${user.Business.Name} has requested your gig', // Notification text
+          `The Business ${user.Business.Name} has requested your gig`, // Notification text
           'gig-request', // Notification type
           result.gid, // Gig id
           selectedPost.pid  // Post id
