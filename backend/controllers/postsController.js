@@ -48,9 +48,14 @@ const getAllPosts = async () => {
     const querySnapshot = await postsRef.get();
 
     const allPosts = [];
-    querySnapshot.forEach((doc) => {
-      allPosts.push(doc.data());
-    });
+    for (let doc of querySnapshot.docs) {
+      const postData = doc.data();
+      const userSnapshot = await postData.postedBy.get();
+      const userData = userSnapshot.data();
+      // replace the postedBy field with the user data
+      postData.postedBy = userData;
+      allPosts.push(postData);
+    }
 
     return allPosts;
   } catch (error) {
@@ -58,6 +63,7 @@ const getAllPosts = async () => {
     throw new Error('Internal server error');
   }
 };
+
 
 const updatePost = async (pid, updatedFields) => {
   try {
