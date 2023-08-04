@@ -1,4 +1,4 @@
-const { db } = require('../firebase');
+const { db, firebaseAdmin } = require('../firebase');
 
 // Get all reviews for a business
 const getBusinessReviews = async (uid) => {
@@ -21,6 +21,23 @@ const getBusinessReviews = async (uid) => {
         }
 }
 
+// Create a review
+const createReview = async (businessAccount, customerAccount, review) => {
+    try {
+        const businessRef = db.collection('User').doc(businessAccount);
+        const customerRef = db.collection('User').doc(customerAccount);
+        review.businessAccount = businessRef;
+        review.customerAccount = customerRef;
+        review.createdAt = firebaseAdmin.firestore.FieldValue.serverTimestamp();
+
+        const reviewRef = await db.collection('Reviews').add(review);
+        return reviewRef.id;
+    } catch (error) {
+        console.error('Error creating review:', error);
+        throw error;
+    }
+};
+
 module.exports = {
-    getBusinessReviews
+    getBusinessReviews, createReview
 }

@@ -92,8 +92,16 @@ export class GoogleMapContainer extends Component {
           ),
           selectedPost: { ...selectedPost, isButtonClicked: true },
         }));
-        console.log("this is the postedby uid", selectedPost.postedBy.uid);
-        const postedByUid = selectedPost.postedBy.split('/')[2];
+        console.log("this is the postedby uid", selectedPost.postedBy);
+        let postedByUid;
+        if (typeof selectedPost.postedBy === 'string') {
+          postedByUid = selectedPost.postedBy.split('/')[2];
+        } else if (typeof selectedPost.postedBy === 'object' && selectedPost.postedBy.uid) {
+          postedByUid = selectedPost.postedBy.uid;
+        } else {
+          throw new Error(`Unexpected format for postedBy: ${selectedPost.postedBy}`);
+        }
+
         console.log('this is the pid and gid', selectedPost.pid, result.gid);
         // Create a notification of type 'gig-request' to the post owner
         return createNotification(

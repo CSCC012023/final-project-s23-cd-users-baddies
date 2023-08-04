@@ -20,6 +20,7 @@ const Notifications = () => {
       const response = await fetch(`http://localhost:3000/api/notifications/${user.uid}`);
       if (response.ok) {
         const notificationsData = await response.json();
+        console.log('Notifications data:', notificationsData);
         setNotifications(notificationsData);
       } else {
         console.error('Error getting notifications:', response.statusText);
@@ -34,6 +35,7 @@ const Notifications = () => {
   }, [user.uid]);
 
   const handleMessageButtonClick = (notification) => {
+    console.log('Notification:', notification); 
     setSelectedNotification(notification);
     setMessageText(''); // Clear the message text when opening the modal
   };
@@ -51,6 +53,7 @@ const Notifications = () => {
       });
 
       if (response.ok) {
+        console.log('Message sent successfully.');
         toast({
           title: "Message Sent.",
           description: "Your message has been sent successfully.",
@@ -71,6 +74,7 @@ const Notifications = () => {
   const handleAcceptClick = async (notification) => {
     try {
       const updatedTimestamp = Date.now();
+      console.log('Accept notification:', notification); 
       
       // Update the status of the gig to "in-progress"
       console.log(notification.gig.gid)
@@ -98,6 +102,7 @@ const Notifications = () => {
         body: JSON.stringify({
           status: 'in-progress',
           gid: notification.gig.gid,
+          business: notification.gig.business
         }),
       });
   
@@ -120,6 +125,7 @@ const Notifications = () => {
       });
   
       if (responseUpdate.ok) {
+        console.log('Notification update response:', responseUpdate); 
         // Update the customer's notification in the local state
         setNotifications(notifications.map((notif) => {
           if (notif.timestamp === notification.timestamp) {
@@ -152,6 +158,7 @@ const Notifications = () => {
           console.error('Failed to create notification:', responseCreate.statusText);
         }
       } else {
+        fetchNotifications();
         console.error('Failed to update notification:', responseUpdate.statusText);
       }
     } catch (error) {
@@ -163,6 +170,7 @@ const Notifications = () => {
   const handleDeclineClick = async (notification) => {
     try {
       const updatedTimestamp = Date.now();
+      console.log('Decline notification:', notification); 
 
       // Call the API to delete the gig
       const responseGigDelete = await fetch(`http://localhost:3000/api/gigs/${notification.gig.gid}/${notification.sender.uid}`, {
@@ -191,6 +199,7 @@ const Notifications = () => {
       });
 
       if (responseUpdate.ok) {
+        console.log('Notification update response:', responseUpdate);
         // Update the customer's notification in the local state
         setNotifications(notifications.map((notif) => {
           if (notif.timestamp === notification.timestamp) {
@@ -223,6 +232,7 @@ const Notifications = () => {
           console.error('Failed to create notification:', responseCreate.statusText);
         }
       } else {
+        fetchNotifications();
         console.error('Failed to update notification:', responseUpdate.statusText);
       }
     } catch (error) {
