@@ -36,6 +36,7 @@ import ServicesTab from './Services/Services';
 import axios from 'axios';
 import ServiceCard from './Services/ServiceCard';
 import ClientCard from './Clients/Clients';
+import Schedule from './Schedule/Schedule';
 
 
 const MyBusiness = () => {
@@ -44,7 +45,7 @@ const MyBusiness = () => {
     { name: 'Services', icon: FiHome, content: ServicesTab },
     { name: 'Schedule', icon: FiCalendar, content: ScheduleTab },
     { name: 'Clients', icon: FiUsers, content: ClientsTab },
-    { name: 'My Reviews', icon: FiStar,  content: ReviewsTab},
+    { name: 'My Reviews', icon: FiStar, content: ReviewsTab },
   ];
 
   const [activeTab, setActiveTab] = useState(0);
@@ -133,7 +134,7 @@ const MyBusiness = () => {
       description: '',
       price: '',
       duration: '',
-      servicePic:'',
+      servicePic: '',
     });
     const { isOpen, onOpen, onClose } = useDisclosure();
     const user = useContext(UserContext);
@@ -153,25 +154,25 @@ const MyBusiness = () => {
 
     const handleImageUpload = async (event) => {
       const file = event.target.files[0];
-  
+
       // Check if the file is an image (JPEG, PNG, GIF)
       const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
       if (!allowedTypes.includes(file.type)) {
         console.log('Please select a valid image file (JPEG, PNG, GIF)');
         return;
       }
-  
+
       try {
         // Upload the image to Firebase Storage
         const storageRef = ref(storage, `postImages/${file.name}`);
         await uploadBytes(storageRef, file);
-  
+
         // Get the download URL of the uploaded image
         const downloadURL = await getDownloadURL(storageRef);
-  
+
         // Set the avatarImage state to the download URL
         setAvatarImage(downloadURL);
-  
+
         // Call handleFormInputChange with the updated URL
         handleFormInputChange({
           target: {
@@ -278,22 +279,22 @@ const MyBusiness = () => {
                   />
                 </FormControl>
                 <Center>
-              <Avatar
-                  bg="blue.300"
-                  size="2xl"
-                  name="Business"
-                  borderRadius="0"
-                  src={avatarImage || "path-to-avatar-image"}/>
+                  <Avatar
+                    bg="blue.300"
+                    size="2xl"
+                    name="Business"
+                    borderRadius="0"
+                    src={avatarImage || "path-to-avatar-image"} />
                 </Center>
                 <Center>
-                <Button w="100%" bg="blue.200" onClick={() => fileInputRef.current.click()}>Upload Picture</Button>
+                  <Button w="100%" bg="blue.200" onClick={() => fileInputRef.current.click()}>Upload Picture</Button>
                 </Center>
                 <input
                   type="file"
                   ref={fileInputRef}
                   style={{ display: 'none' }}
                   onChange={handleImageUpload}
-                  />
+                />
               </VStack>
             </ModalBody>
             <ModalFooter>
@@ -311,7 +312,9 @@ const MyBusiness = () => {
   }
 
   function ScheduleTab() {
-
+    return (
+      <Schedule />
+    );
   }
 
   function ClientsTab() {
@@ -341,7 +344,7 @@ const MyBusiness = () => {
         <Box mt="90px">
           <Flex flexWrap="wrap" justifyContent="flex-start">
             {clients.map((client) => (
-              <ClientCard/>
+              <ClientCard />
             ))}
           </Flex>
         </Box>
