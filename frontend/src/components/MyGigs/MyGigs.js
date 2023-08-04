@@ -71,11 +71,11 @@ const MyGigs = () => {
         p={4}
       >
         <Stack spacing={3} direction="row" align="center" display="flex">
-          <Button colorScheme="teal" onClick={() => filterPostsByStatus("request-gig")}>
-            Request
-          </Button>
-          <Button colorScheme="red" onClick={() => filterPostsByStatus("requested")}>
+          <Button colorScheme="teal" onClick={() => filterPostsByStatus("requested")}>
             Requested
+          </Button>
+          <Button colorScheme="red" onClick={() => filterPostsByStatus("in-progress")}>
+            In-Progress
           </Button>
           <Button colorScheme="teal" onClick={() => filterPostsByStatus("completed")}>
             Completed
@@ -88,7 +88,7 @@ const MyGigs = () => {
 
       {gigs.filter((gig) => gig.status === filteredStatus).length > 0 && (
         <div className="post-container">
-          <Box display="flex" flexWrap="wrap">
+          <Box display="flex" flexWrap="wrap" justifyContent="center" marginTop="60">
             {gigs
               .filter((gig) => gig.status === filteredStatus)
               .map((gig) => (
