@@ -74,6 +74,24 @@ const updateUserProfile = async (userId, updateFields) => {
   }
 };
 
+const getUserClients = async (userId) => {
+  try {
+    const userRef = db.collection('User').doc(userId).collection('PastClients');
+    const clientsSnapshot = await userRef.get();
+    const clients = [];
+
+    clientsSnapshot.forEach((doc) => {
+      const client = doc.data();
+      clients.push(client);
+    });
+
+    return clients;
+  } catch (error) {
+    console.error('Error getting user clients:', error);
+    throw new Error('Internal server error');
+  }
+};
+
 // Get services for a specific user
 const getUserServices = async (userId) => {
   try {
@@ -160,12 +178,13 @@ const editUserService = async (userId, serviceId, updatedService) => {
   }
 };
 
-module.exports = { 
+module.exports = {
   getAllUsers,
   getUserProfile,
   updateUserProfile,
   getBusinessUsers,
   getUserServices,
+  getUserClients,
   addBusinessUserService,
   editUserService,
   deleteUserService
