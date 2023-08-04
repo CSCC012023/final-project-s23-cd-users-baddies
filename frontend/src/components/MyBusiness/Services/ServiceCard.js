@@ -26,12 +26,13 @@ import {
 } from '@chakra-ui/react';
 import { UserContext } from '../../User/UserContext';
 
-function ServiceCard({ serviceId,name, description, price, duration, onDeleteService }) {
+function ServiceCard({ serviceId,name, description, price, duration, servicePic, onDeleteService }) {
   const [editedService, setEditedService] = useState({
     serviceName: name,
     description: description,
     price: price,
     duration: duration,
+    servicePic: servicePic,
   });
   const [isOpen, setIsOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -63,6 +64,8 @@ function ServiceCard({ serviceId,name, description, price, duration, onDeleteSer
   };
 
 
+
+
   const handleOpenEditModal = () => {
     setIsOpen(true);
   };
@@ -79,6 +82,7 @@ function ServiceCard({ serviceId,name, description, price, duration, onDeleteSer
   const user = useContext(UserContext)
   
   const handleSaveChanges = async () => {
+  
     try {
       const updatedServiceData = {
         serviceName: editedService.serviceName,
@@ -86,16 +90,17 @@ function ServiceCard({ serviceId,name, description, price, duration, onDeleteSer
         price: editedService.price,
         duration: editedService.duration,
       };
+
       
 
       // Make the PUT request to update the service
-      console.log(user)
+      // console.log(user)
       const response = await axios.put(
         `http://localhost:3000/api/users/services/${user.uid}/${serviceId}`,
         updatedServiceData
       );
 
-      console.log(response.data); // Log the response from the backend (optional)
+      // console.log(response.data); // Log the response from the backend (optional)
 
       // Close the modal and do any other necessary actions
       handleCloseEditModal();
@@ -109,7 +114,7 @@ function ServiceCard({ serviceId,name, description, price, duration, onDeleteSer
     <Card w="350px" maxW="sm" m="10px">
       <CardBody>
         <Image
-          src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"
+          src={editedService.servicePic ? editedService.servicePic : "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80"}
           alt="Service"
           borderRadius="lg"
         />

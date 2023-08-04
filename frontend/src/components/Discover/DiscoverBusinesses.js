@@ -14,6 +14,8 @@ import {
   useDisclosure,
   Text,
   Box,
+  Center
+
 } from '@chakra-ui/react';
 import axios from 'axios';
 import './customer/Discover.css';
@@ -57,7 +59,9 @@ const DiscoverBusinesses = () => {
               overflow="hidden"
               boxShadow="lg"
             >
-              <img src={bisimg} alt={business.Name} />
+              <Center>
+                <Image h="100px" src={business.profilePicture || bisimg} alt={business.Name} />
+                </Center>
               <Box p="6">
                 <Box d="flex" alignItems="baseline">
                   <Text fontWeight="semibold" fontSize="xl">
