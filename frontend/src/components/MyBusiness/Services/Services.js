@@ -1,4 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import {
   Box,
   Button,
@@ -16,6 +17,9 @@ import {
   Textarea,
   useDisclosure,
   VStack,
+  Center,
+  Avatar, 
+
 } from '@chakra-ui/react';
 import axios from 'axios';
 import ServiceCard from './ServiceCard';
@@ -23,12 +27,18 @@ import { UserContext } from '../../User/UserContext';
 
 
 function ServicesTab() {
+
+    const [avatarImage, setAvatarImage] = useState(null);
+    const fileInputRef = useRef(null);
+    const storage = getStorage();
+
     const [services, setServices] = useState([]);
     const [newService, setNewService] = useState({
       serviceName: '',
       description: '',
       price: '',
       duration: '',
+      servicePic: ''
     });
     const { isOpen, onOpen, onClose } = useDisclosure();
     const user = useContext(UserContext);
@@ -47,7 +57,11 @@ function ServicesTab() {
     };
   
     const handleAddService = async () => {
+
+      
+
       try {
+        
         const response = await axios.post(`http://localhost:3000/api/users/services/${user.uid}`, newService);
         console.log(response.data);
         onClose();
@@ -56,8 +70,42 @@ function ServicesTab() {
         console.error('Error adding service:', error);
       }
     };
+
+    const handleImageUpload = async (event) => {
+      const file = event.target.files[0];
+  
+      // Check if the file is an image (JPEG, PNG, GIF)
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        console.log('Please select a valid image file (JPEG, PNG, GIF)');
+        return;
+      }
+  
+      try {
+        // Upload the image to Firebase Storage
+        const storageRef = ref(storage, `postImages/${file.name}`);
+        await uploadBytes(storageRef, file);
+  
+        // Get the download URL of the uploaded image
+        const downloadURL = await getDownloadURL(storageRef);
+  
+        // Set the avatarImage state to the download URL
+        setAvatarImage(downloadURL);
+  
+        // Call handleFormInputChange with the updated URL
+        handleFormInputChange({
+          target: {
+            name: 'servicePic',
+            value: downloadURL,
+          },
+        });
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    };
   
     const handleFormInputChange = (event) => {
+
       const { name, value } = event.target;
       setNewService({ ...newService, [name]: value });
     };
@@ -75,9 +123,8 @@ function ServicesTab() {
               description={service.description}
               price={service.price}
               duration={service.duration}
+              servicePic={service.servicePic}
               onDeleteService={fetchUserServices}
-
-
             />
           ))}
           </Flex>
@@ -132,6 +179,23 @@ function ServicesTab() {
                     onChange={handleFormInputChange}
                   />
                 </FormControl>
+                <Center>
+              <Avatar
+                  bg="blue.300"
+                  size="2xl"
+                  name="Business"
+                  borderRadius="0"
+                  src={avatarImage || "path-to-avatar-image"}/>
+                </Center>
+                <Center>
+                <Button w="100%" bg="blue.200" onClick={() => fileInputRef.current.click()}>Upload Picture</Button>
+                </Center>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleImageUpload}
+                  />
               </VStack>
             </ModalBody>
             <ModalFooter>
