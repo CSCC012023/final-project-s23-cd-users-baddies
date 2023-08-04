@@ -25,10 +25,14 @@ import io from 'socket.io-client';
 // const SERVER_URL = 'http://localhost:3000'; // Replace this with the actual URL of your Socket.IO server
 // const socket = io(SERVER_URL)
 
+
 const SideBar = ({ handleContactSelect }) => {
   const user = useContext(UserContext);
   const [chatContacts, setChatContacts] = useState([]);
 
+  
+  const displayName = user.Business && user.Business.Name ? user.Business.Name : user.Name;
+  console.log(displayName)
   useEffect(() => {
     const fetchChatContacts = async () => {
       try {
@@ -64,9 +68,9 @@ const SideBar = ({ handleContactSelect }) => {
         borderBottom="1px solid"
         borderColor="#50545c"
       >
-        <Avatar mt="75px" ml="20px"></Avatar>
+        <Avatar src={user.profilePicture} mt="75px" ml="20px"></Avatar>
         <Flex align="center" justifyContent="space-between" mt="10vh" marginEnd={3} p="3">
-          <Text color="teal.400">{user.Name}</Text>
+          <Text color="teal.400">{displayName}</Text>
         </Flex>
       </Flex>
       <Flex flexDirection="column" overflowX="scroll" sx={{ scrollbarWidth: "0px" }} flex={1}>
@@ -82,11 +86,12 @@ const Chat = ({ contact, handleContactSelect }) => {
   const handleClick = () => {
     handleContactSelect(contact); // Make sure `contact` has the `uid` property
     // console.log(contact)
+    console.log(contact)
   };
 
   return (
     <Flex m="3" p={3} align="center" _hover={{ bg: "teal.400", cursor: "pointer" }} onClick={handleClick}>
-      <Avatar src={contact.avatar} />
+      <Avatar src={contact.profilePicture} />
       <Text  ml="10px">{contact.name}</Text>
     </Flex>
   );
@@ -96,7 +101,7 @@ const Chat = ({ contact, handleContactSelect }) => {
 const TopBar = ({ selectedContact }) => {
   return (
     <Flex w="100%" h="20vh" align="center" borderBottom="1px solid" borderColor="#50545c">
-      <Avatar mt="10vh" src={selectedContact.avatar} ml="3" />
+      <Avatar mt="10vh" src={selectedContact.profilePicture} ml="3" />
       <Text align="center" justifyContent="space-between" mt="10vh" marginEnd={3} p="3" fontSize='3xl'>
         {selectedContact.name}
       </Text>

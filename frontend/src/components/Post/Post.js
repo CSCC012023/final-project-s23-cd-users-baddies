@@ -1,7 +1,9 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Post.css';
 import { UserContext } from '../User/UserContext';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { initializeApp } from 'firebase/app';
 import {
   Flex,
   Heading,
@@ -10,6 +12,7 @@ import {
   InputGroup,
   Stack,
   Image,
+  Avatar,
   Box,
   Link,
   Center,
@@ -31,9 +34,12 @@ const Post = () => {
   });
   const openai = new OpenAIApi(configuration);
   const toast = useToast(); // Add this to display the toast notifications
+  const storage = getStorage();
   const user = useContext(UserContext);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [avatarImage, setAvatarImage] = useState(null);
+  const fileInputRef = useRef(null);
   const [price, setPrice] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const navigate = useNavigate();
@@ -73,6 +79,20 @@ const Post = () => {
           console.log(data)
           const lat = data.results[0].geometry.location.lat;
           const lon = data.results[0].geometry.location.lng;
+
+          if (avatarImage) {
+            // Upload the image to Firebase Storage
+            const storageRef = ref(storage, `postImages/${avatarImage.name}`);
+            await uploadBytes(storageRef, avatarImage);
+      
+            // Get the download URL of the uploaded image
+            const downloadURL = await getDownloadURL(storageRef);
+      
+            // Set the postPic to the download URL
+            const postPic = downloadURL;
+          
+
+          
           // Make a POST request to the backend API
           const res = await fetch(`http://localhost:3000/api/posts/users/${user.uid}/posts`, {
             method: 'POST',
@@ -87,8 +107,9 @@ const Post = () => {
               postalCode,
               status: 'posted',
               postedBy: `/User/${user.uid}`, // Reference to the user who created the post
+              postPic: postPic
             })
-
+          
           }
           );
           if (res.ok) {
@@ -106,12 +127,38 @@ const Post = () => {
               duration: 3000,
               isClosable: true,
             });
-          }
+          }}
         })
     } catch (error) {
       console.error('Error adding post:', error);
     }
   };
+  
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+
+    // Check if the file is an image (JPEG, PNG, GIF)
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      console.log('Please select a valid image file (JPEG, PNG, GIF)');
+      return;
+    }
+
+    try {
+      // Upload the image to Firebase Storage
+      const storageRef = ref(storage, `postImages/${file.name}`);
+      await uploadBytes(storageRef, file);
+
+      // Get the download URL of the uploaded image
+      const downloadURL = await getDownloadURL(storageRef);
+
+      // Set the avatarImage state to the download URL
+      setAvatarImage(downloadURL);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  };
+
   const handleWizard = async () => {
     console.log("hi")
     if (title === '') {
@@ -219,6 +266,24 @@ const Post = () => {
                   value={postalCode} onChange={e => setPostalCode(e.target.value)} />
               </InputGroup>
             </FormControl>
+
+            <Center>
+              <Avatar
+                  bg="blue.300"
+                  size="2xl"
+                  name="Business"
+                  borderRadius="0"
+                  src={avatarImage || "path-to-avatar-image"}/>
+                </Center>
+                <Center>
+                <Button w="50%" bg="blue.400" onClick={() => fileInputRef.current.click()}>Upload Picture</Button>
+                </Center>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleImageUpload}
+                  />
 
 
             <Button

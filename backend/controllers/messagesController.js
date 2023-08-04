@@ -184,9 +184,9 @@ const getChatContacts = async (uid) => {
 
       // Get the name of the chatWith user
       const chatWithUserName = chatWithUserData.Name; // Replace 'Name' with the actual field that stores the user's name in your database
-
+      const chatWithPic = chatWithUserData.profilePicture;
       // Add the chatWith user ID and name to the chatContacts array
-      chatContacts.push({ userId: chatWithUserId, name: chatWithUserName });
+      chatContacts.push({ userId: chatWithUserId, name: chatWithUserName, profilePicture: chatWithPic });
     }
 
     return chatContacts;
