@@ -33,6 +33,8 @@ const MyPosts = () => {
   const [filteredStatus, setFilteredStatus] = useState("posted");
   const [selectedPost, setSelectedPost] = useState(null);
   const [isReviewing, setIsReviewing] = useState(false);
+  const [rating, setRating] = useState(1);
+ const [feedback, setFeedback] = useState('');
 
   const { isOpen: isDetailsOpen, onOpen: onDetailsOpen, onClose: onDetailsClose } = useDisclosure();
   const { isOpen: isCompleteOpen, onOpen: onCompleteOpen, onClose: onCompleteClose } = useDisclosure();
@@ -54,14 +56,19 @@ const MyPosts = () => {
       await axios.put(`http://localhost:3000/api/gigs/${gigId}`, {
         newStatus: "completed",
       });
-      
+  
+      // Add client to past clients of the business
+      await axios.post(`http://localhost:3000/api/users/manage-clients/${post.business._path.segments[1]}`, {
+        clientId: user.uid, 
+        lastDeal: new Date().toISOString()
+      });
+  
       // Update the post status in the local state if necessary
       // For example, you could filter the post list and remove the completed post
       setPosts((prevPosts) =>
         prevPosts.map((p) => (p.pid === postId ? { ...p, status: "completed" } : p))
       );
       
-      setSelectedPost(null); // Reset the selectedPost state
       onCompleteClose(); // Close the modal after successful completion
       
       // After completing the post, ask the user if they want to leave a review
@@ -72,14 +79,32 @@ const MyPosts = () => {
       console.error('Error completing the post:', error);
     }
   };
+  
 
-  const handleReviewSubmit = () => {
-    // Call your API to save the review
-    // For now we just have a placeholder function
-    console.log('Review submitted');
-    
-    setIsReviewing(false);
-    onReviewClose();
+  const handleReviewSubmit = async () => {
+    try {
+        await axios.post(`http://localhost:3000/api/reviews/${selectedPost.business._path.segments[1]}/${user.uid}`, {
+            rating,
+            feedback,
+        });
+
+        setIsReviewing(false);
+        onReviewClose();
+
+        // Reset the review form
+        setSelectedPost(null); // Reset the selectedPost state
+        setRating(1);
+        setFeedback('');
+
+        console.log('Review submitted');
+    } catch (error) {
+        console.error('Error submitting the review:', error);
+    }
+  };
+
+  const handleDetailsOpen = (post) => {
+    setSelectedPost(post);
+    onDetailsOpen();
   };
 
   useEffect(() => {
@@ -149,33 +174,34 @@ const MyPosts = () => {
                   <Divider />
                   <CardFooter>
                     <ButtonGroup spacing="2" margin="10px" >
-                      <Button onClick={onDetailsOpen} variant="solid" colorScheme="blue" ml={post.status === "posted" || post.status === "completed"? "50px" : "flex-start"} >
-                        Details
-                      </Button>
-                      <Modal isOpen={isDetailsOpen} onClose={onDetailsClose}>
-                        <ModalOverlay />
-                        <ModalContent
-                          position="absolute"
-                          top="25%"
-                          transform="translate(-50%, -50%)"
-                          maxW="80%" // Optional: Set the maximum width of the modal
-                          width="fit-content" // Optional: Adjust the width based on the modal content
-                        >
-                          <ModalHeader>{post.title}</ModalHeader>
-                          <ModalCloseButton />
-                          <ModalBody>
-                            <Text>Description: {post.description}</Text>
-                            <Text>Location: {post.address}</Text>
-                            <Text>Price: ${post.price}</Text>
-                          </ModalBody>
+                    <Button onClick={() => handleDetailsOpen(post)} variant="solid" colorScheme="blue" ml={post.status === "posted" || post.status === "completed"? "50px" : "flex-start"} >
+                      Details
+                    </Button>
 
-                          <ModalFooter>
-                            <Button colorScheme='blue' mr={3} onClick={onDetailsClose}>
-                              Close
-                            </Button>
-                          </ModalFooter>
-                        </ModalContent>
-                      </Modal>
+                    <Modal isOpen={isDetailsOpen} onClose={onDetailsClose}>
+                      <ModalOverlay style={{backgroundColor: 'rgba(0, 0, 0, 0.3)'}}/>
+                      <ModalContent
+                        position="absolute"
+                        top="25%"
+                        transform="translate(-50%, -50%)"
+                        maxW="80%" // Optional: Set the maximum width of the modal
+                        width="fit-content" // Optional: Adjust the width based on the modal content
+                      >
+                        <ModalHeader>{selectedPost?.title}</ModalHeader>
+                        <ModalCloseButton />
+                        <ModalBody>
+                          <Text>Description: {selectedPost?.description}</Text>
+                          <Text>Location: {selectedPost?.address}</Text>
+                          <Text>Price: ${selectedPost?.price}</Text>
+                        </ModalBody>
+
+                        <ModalFooter>
+                          <Button colorScheme='blue' mr={3} onClick={onDetailsClose}>
+                            Close
+                          </Button>
+                        </ModalFooter>
+                      </ModalContent>
+                    </Modal>
                       {post.status === "in-progress" && (
                       <Button variant="solid" colorScheme="teal" onClick={() => {
                         setSelectedPost(post); // Set the selectedPost before opening the modal
@@ -222,19 +248,20 @@ const MyPosts = () => {
         <ModalHeader>Leave a Review</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          {isReviewing && (
-            <form>
-              <FormControl id="rating" isRequired>
-                <FormLabel>Rating</FormLabel>
-                <Input type="number" min="1" max="5" />
-              </FormControl>
-              <FormControl id="review" isRequired>
-                <FormLabel>Review</FormLabel>
-                <Textarea />
-              </FormControl>
-            </form>
-          )}
+            {isReviewing && (
+                <form>
+                    <FormControl id="rating" isRequired>
+                        <FormLabel>Rating</FormLabel>
+                        <Input type="string" value={rating} onChange={(e) => setRating(e.target.value)} />
+                    </FormControl>
+                    <FormControl id="review" isRequired>
+                        <FormLabel>Review</FormLabel>
+                        <Textarea value={feedback} onChange={(e) => setFeedback(e.target.value)} />
+                    </FormControl>
+                </form>
+            )}
         </ModalBody>
+
         <ModalFooter>
           <Button colorScheme="blue" mr={3} onClick={handleReviewSubmit}>
             Submit

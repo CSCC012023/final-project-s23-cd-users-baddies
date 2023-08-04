@@ -34,7 +34,7 @@ import { UserContext } from '../User/UserContext';
 import ReviewsTab from './Reviews/Reviews';
 import ServicesTab from './Services/Services';
 import axios from 'axios';
-import ServiceCard from './Services/ServiceCard'
+import ServiceCard from './Services/ServiceCard';
 import ClientCard from './Clients/Clients';
 
 
@@ -44,7 +44,7 @@ const MyBusiness = () => {
     { name: 'Services', icon: FiHome, content: ServicesTab },
     { name: 'Schedule', icon: FiCalendar, content: ScheduleTab },
     { name: 'Clients', icon: FiUsers, content: ClientsTab },
-    { name: 'My Reviews', icon: FiStar, content: ReviewsTab },
+    { name: 'My Reviews', icon: FiStar,  content: ReviewsTab},
   ];
 
   const [activeTab, setActiveTab] = useState(0);
@@ -349,11 +349,6 @@ const MyBusiness = () => {
         </Box>
       </Box>
     );
-  }
-
-
-  function ReviewsTab() {
-
   }
 
   return (
