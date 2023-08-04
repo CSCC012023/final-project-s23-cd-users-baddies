@@ -25,6 +25,7 @@ const DiscoverBusinesses = () => {
   const [selectedBusiness, setSelectedBusiness] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const businessesPerPage = 6;
+  const [services, setServices] = useState([]);
 
   useEffect(() => {
     // Fetch businesses data from the server
@@ -43,6 +44,15 @@ const DiscoverBusinesses = () => {
   const handleBusinessClick = (business) => {
     setSelectedBusiness(business);
     onOpen();
+  };
+
+  const handleViewServices = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/users/services/${selectedBusiness.uid}`);
+      setServices(response.data);
+    } catch (error) {
+      console.error('Error fetching services:', error);
+    }
   };
 
   // Calculate the index range for the current page
@@ -136,7 +146,47 @@ const DiscoverBusinesses = () => {
             </Box>
           </ModalBody>
           <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={handleViewServices}>
+              View Services
+            </Button>
             <Button colorScheme="blue" mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      {/* Pop-up for viewing services */}
+      <Modal isOpen={services.length > 0} onClose={() => setServices([])}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Services for {selectedBusiness?.Name}</ModalHeader>
+          <ModalCloseButton />
+          {services.length > 0 ? (
+            // If services array is not empty, display the services
+            <ModalBody>
+              {services.map((service) => (
+                <Box key={service.serviceId} mt="4">
+                  <Text fontSize="xl">Service Name: {service.serviceName}</Text>
+                  <Text fontSize="lg">Description: {service.description}</Text>
+                  <Text fontSize="lg">Duration: {service.duration}</Text>
+                  <Text fontSize="lg">Price: {service.price}</Text>
+                </Box>
+              ))}
+            </ModalBody>
+          ) : (
+            // If services array is empty, display "No services available" message
+            <ModalBody textAlign="center">
+              <Text fontSize="xl" color="red">
+                No services available
+              </Text>
+              <Button colorScheme="red" mt="4" onClick={() => setServices([])}>
+                Close
+              </Button>
+            </ModalBody>
+          )}
+          <ModalFooter>
+            <Button colorScheme="blue" mr={3} onClick={() => setServices([])}>
               Close
             </Button>
           </ModalFooter>
