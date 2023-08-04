@@ -14,17 +14,17 @@ import {
   useDisclosure,
   Text,
   Box,
-  Center
-
+  Center,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import './customer/Discover.css';
 import bisimg from './businessimg.jpeg';
 
 const DiscoverBusinesses = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusiness, setSelectedBusiness] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const businessesPerPage = 6;
 
   useEffect(() => {
     // Fetch businesses data from the server
@@ -45,23 +45,36 @@ const DiscoverBusinesses = () => {
     onOpen();
   };
 
+  // Calculate the index range for the current page
+  const lastIndex = currentPage * businessesPerPage;
+  const firstIndex = lastIndex - businessesPerPage;
+  const currentBusinesses = businesses.slice(firstIndex, lastIndex);
+
+  // Calculate grid row and column for each business item
+  const getGridRow = (index) => Math.floor(index / 3) + 1;
+  const getGridColumn = (index) => index % 3 + 1;
+
   return (
-    <div className="bodyy">
-      <h1 className="title">Discover Businesses</h1>
-      <Grid templateColumns="repeat(3, 1fr)" gap={4}>
-        {businesses.map((business) => (
-          <GridItem key={business.uid}>
+    <Box p="4">
+      <Text fontSize="3xl" fontWeight="bold" textAlign="center" mb="4">
+        Discover Businesses
+      </Text>
+
+      {/* Grid */}
+      <Grid templateColumns="repeat(3, 1fr)" gap="4">
+        {currentBusinesses.map((business, index) => (
+          <GridItem key={business.uid} row={getGridRow(index)} col={getGridColumn(index)}>
             <Box
               maxW="400px"
-              maxH="400px"
               borderWidth="1px"
               borderRadius="lg"
               overflow="hidden"
               boxShadow="lg"
+              p="4"
             >
               <Center>
-                <Image h="100px" src={business.profilePicture || bisimg} alt={business.Name} />
-                </Center>
+                <Image h="200px" src={business.profilePicture || bisimg} alt={business.Name} />
+              </Center>
               <Box p="6">
                 <Box d="flex" alignItems="baseline">
                   <Text fontWeight="semibold" fontSize="xl">
@@ -71,7 +84,7 @@ const DiscoverBusinesses = () => {
                 <Box mt="1" fontSize="sm">
                   Location: {business.Location}
                 </Box>
-                <Button mt="2" onClick={() => handleBusinessClick(business)}>
+                <Button mt="2" colorScheme="blue" onClick={() => handleBusinessClick(business)}>
                   Details
                 </Button>
               </Box>
@@ -80,6 +93,25 @@ const DiscoverBusinesses = () => {
         ))}
       </Grid>
 
+      {/* Next and Previous Buttons */}
+      <Box mt="4" textAlign="center">
+        <Button
+          colorScheme="blue"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => prev - 1)}
+        >
+          Previous
+        </Button>
+        <Button
+          ml="2"
+          colorScheme="blue"
+          disabled={lastIndex >= businesses.length}
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+        >
+          Next
+        </Button>
+      </Box>
+
       {/* Modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -87,7 +119,9 @@ const DiscoverBusinesses = () => {
           <ModalHeader>{selectedBusiness?.Name}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Image src={bisimg} alt={selectedBusiness?.Name} />
+            <Center>
+              <Image src={bisimg} alt={selectedBusiness?.Name} maxH="200px" />
+            </Center>
             <Box mt="4">
               <Text fontSize="xl">Location: {selectedBusiness?.Location}</Text>
               <Text fontSize="xl">Description: {selectedBusiness?.Business?.Description}</Text>
@@ -106,9 +140,8 @@ const DiscoverBusinesses = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
-    </div>
+    </Box>
   );
 };
 
 export default DiscoverBusinesses;
-
