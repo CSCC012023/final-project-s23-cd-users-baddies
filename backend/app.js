@@ -21,12 +21,14 @@ const io = new Server( server, {
 app.set('io', io);
 
 // Routes
+const reviewRoutes = require('./routes/reviews')
 const postRoutes = require('./routes/posts');
 const usersRoutes = require('./routes/users');
 const authRoutes = require('./routes/auth');
 const messagesRoutes = require('./routes/messages');
 const gigsRoutes = require('./routes/gigs');
 const notificationsRoutes = require('./routes/notifications');
+app.use('/api/reviews', reviewRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/users', usersRoutes);
 app.use('/api/auths', authRoutes);
