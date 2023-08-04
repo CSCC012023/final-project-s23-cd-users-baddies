@@ -15,6 +15,7 @@ const SelectedPostCard = ({ post, onButtonClick }) => {
 
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const onDetailsClose = () => setIsDetailsOpen(false);
+  console.log(post.postPic)
 
   return (
     <Card
@@ -25,7 +26,7 @@ const SelectedPostCard = ({ post, onButtonClick }) => {
       <Image
         objectFit='cover'
         maxW={{ base: '100%', sm: '300px' }}
-        src={bizimg}
+        src={post.postPic || bizimg}
         alt={post.title}
       />
 
