@@ -1,0 +1,51 @@
+# Bizreach/cd-user-baddies
+
+
+## Iteration XX - Review & Retrospect
+
+ * When: August 4th, 2023
+ * Where: Discord
+
+## Process - Reflection
+
+BizReach is an online platform used to connect nearby mobile businesses to customers in need of their services. In this file, we will discuss our insights into the first sprint of creating BizReach. We will discuss our plan before the sprint, our plan during the sprint, and how we can improve our plan for the next sprint.
+
+#### Decisions that turned out well
+
+ * Refractoring our code: We cleaned up our code and separated frontend and backend using best practices. This was a great decision because it allowed us to develop new features without breaking the old ones.
+ * Creating a detailed flow doc. This was a great decision because it assured everyone on the team was on the same page.
+
+#### Decisions that did not turn out as well as we hoped
+
+ * Not focusing on UI: We ended up losing marks on having a bad UI because we focused on functionality of each component. 
+ * Not having sprints: In the first iteration, we didn’t do enough sprints which caused us to lack in many areas such as UI
+
+
+#### Planned changes
+
+We do not plan to make any process related changes. The process we have now works great.
+
+## Product - Review
+
+#### Goals and/or tasks that were met/completed:
+
+ * Finish Messaging feature - [Biz-2](https://bizreach2023.atlassian.net/jira/software/projects/BIZ/boards/1/backlog?selectedIssue=BIZ-2 "Biz-2")
+ * Get notifications - [Biz-13](https://bizreach2023.atlassian.net/jira/software/projects/BIZ/boards/1/backlog?selectedIssue=BIZ-13 "Biz-13")
+ * Write Reviews - [Biz-9](https://bizreach2023.atlassian.net/jira/software/projects/BIZ/boards/1/backlog?selectedIssue=BIZ-9 "Biz-9")
+ * See previous clients/orders 
+ * Add Pictures throughout platfrom - [Biz-11](https://bizreach2023.atlassian.net/jira/software/projects/BIZ/boards/1/backlog?selectedIssue=BIZ-11 "Biz-11")
+ * Improve UI 
+
+#### Goals and/or tasks that were planned but not met/completed:
+
+ * Blocking businesses
+ * Payment system
+ 
+ We did not complete those tasks because we didn't get it yet.
+
+## Meeting Highlights
+
+This is the last iteration!
+
+
+
