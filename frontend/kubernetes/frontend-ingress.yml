@@ -4,7 +4,8 @@ metadata:
   name: frontend-ingress
 spec:
   rules:
-  - http:
+  - host: "bizreach.ca"
+    http:
       paths:
       - backend:
           service:
@@ -13,4 +14,3 @@ spec:
               number: 80
         path: /
         pathType: Prefix
-
