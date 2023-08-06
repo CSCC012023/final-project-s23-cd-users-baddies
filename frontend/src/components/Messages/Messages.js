@@ -21,10 +21,7 @@ import {
   Avatar
 } from "@chakra-ui/react";
 import io from 'socket.io-client';
-
-// const SERVER_URL = 'http://localhost:3000'; // Replace this with the actual URL of your Socket.IO server
-// const socket = io(SERVER_URL)
-
+import { backendUrl } from '../../config';
 
 const SideBar = ({ handleContactSelect }) => {
   const user = useContext(UserContext);
@@ -36,7 +33,7 @@ const SideBar = ({ handleContactSelect }) => {
   useEffect(() => {
     const fetchChatContacts = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/messages/contacts/${user.uid}`);
+        const response = await fetch(`${backendUrl}/api/messages/contacts/${user.uid}`);
         if (response.ok) {
           const chatContactsData = await response.json();
           setChatContacts(chatContactsData);
@@ -156,7 +153,7 @@ const Messages = ({ selectedUserUid }) => {
 
   useEffect(() => {
     // Create a socket.io client connection to the backend server
-    const socket = io('http://localhost:3000');
+    const socket = io(backendUrl);
 
     // Listen for the 'newMessage' event from the server
     socket.on('newMessage', (data) => {
@@ -179,7 +176,7 @@ const Messages = ({ selectedUserUid }) => {
   useEffect(() => {
     const fetchChatContacts = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/messages/contacts/${user.uid}`);
+        const response = await fetch(`${backendUrl}/api/messages/contacts/${user.uid}`);
         if (response.ok) {
           const chatContactsData = await response.json();
           setChatContacts(chatContactsData);
@@ -209,7 +206,7 @@ const Messages = ({ selectedUserUid }) => {
   const fetchChatMessages = async (selectedUserUid) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/messages/${user.uid}/${selectedUserUid}`
+        `${backendUrl}/api/messages/${user.uid}/${selectedUserUid}`
       );
       if (response.ok) {
         const chatMessagesDataForContact = await response.json();
@@ -233,7 +230,7 @@ const Messages = ({ selectedUserUid }) => {
   const handleSendMessage = async (text, selectedUserUid) => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/messages/${user.uid}/${selectedUserUid}`,
+        `${backendUrl}/api/messages/${user.uid}/${selectedUserUid}`,
         {
           method: 'POST',
           headers: {

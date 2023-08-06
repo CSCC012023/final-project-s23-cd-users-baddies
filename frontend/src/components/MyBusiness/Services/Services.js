@@ -24,6 +24,7 @@ import {
 import axios from 'axios';
 import ServiceCard from './ServiceCard';
 import { UserContext } from '../../User/UserContext';
+import { backendUrl } from '../../../config';
 
 
 function ServicesTab() {
@@ -49,7 +50,7 @@ function ServicesTab() {
   
     const fetchUserServices = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/users/services/${user.uid}`);
+        const response = await axios.get(`${backendUrl}/api/users/services/${user.uid}`);
         setServices(response.data);
       } catch (error) {
         console.error('Error fetching services:', error);
@@ -62,7 +63,7 @@ function ServicesTab() {
 
       try {
         
-        const response = await axios.post(`http://localhost:3000/api/users/services/${user.uid}`, newService);
+        const response = await axios.post(`${backendUrl}/api/users/services/${user.uid}`, newService);
         console.log(response.data);
         onClose();
         fetchUserServices();

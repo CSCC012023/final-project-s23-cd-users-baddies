@@ -10,6 +10,7 @@ import {
     CardBody,
 } from '@chakra-ui/react';
 import { UserContext } from '../../User/UserContext';
+import { backendUrl } from '../../../config';
 
 function ClientCard({ name }) {
     const [clientData, setClientData] = useState([]);
@@ -21,7 +22,7 @@ function ClientCard({ name }) {
     const user = useContext(UserContext);
     const fetchClientData = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/api/users/clients/${user.uid}`);
+            const response = await axios.get(`${backendUrl}/api/users/clients/${user.uid}`);
             const clients = response.data;
 
             const clientDetailsPromises = clients.map((client) => fetchClientDetails(client.client._path.segments[1]));
@@ -41,7 +42,7 @@ function ClientCard({ name }) {
 
     const fetchClientDetails = async (clientId) => {
         try {
-            const response = await axios.get(`http://localhost:3000/api/users/profile/${clientId}`);
+            const response = await axios.get(`${backendUrl}/api/users/profile/${clientId}`);
             const clientDetails = response.data;
             return clientDetails;
         } catch (error) {

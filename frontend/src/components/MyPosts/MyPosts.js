@@ -28,6 +28,7 @@ import {
   Textarea 
 } from "@chakra-ui/react";
 import axios from 'axios';
+import { backendUrl } from '../../config';
 
 const MyPosts = () => {
   const user = useContext(UserContext);
@@ -50,17 +51,17 @@ const MyPosts = () => {
     try {
       const postId = post.pid;
       const gigId = post.gid; // assuming gid is available in post object
-      await axios.put(`http://localhost:3000/api/posts/${postId}`, {
+      await axios.put(`${backendUrl}/api/posts/${postId}`, {
         status: "completed",
       });
   
       // Update gig status
-      await axios.put(`http://localhost:3000/api/gigs/${gigId}`, {
+      await axios.put(`${backendUrl}/api/gigs/${gigId}`, {
         newStatus: "completed",
       });
   
       // Add client to past clients of the business
-      await axios.post(`http://localhost:3000/api/users/manage-clients/${post.business._path.segments[1]}`, {
+      await axios.post(`${backendUrl}/api/users/manage-clients/${post.business._path.segments[1]}`, {
         clientId: user.uid, 
         lastDeal: new Date().toISOString()
       });
@@ -85,7 +86,7 @@ const MyPosts = () => {
 
   const handleReviewSubmit = async () => {
     try {
-        await axios.post(`http://localhost:3000/api/reviews/${selectedPost.business._path.segments[1]}/${user.uid}`, {
+        await axios.post(`${backendUrl}/api/reviews/${selectedPost.business._path.segments[1]}/${user.uid}`, {
             rating,
             feedback,
         });
@@ -113,7 +114,7 @@ const MyPosts = () => {
     const fetchUserPosts = async () => {
       try {
         // console.log(user.uid);
-        const response = await axios.get(`http://localhost:3000/api/posts/users/${user.uid}/posts`);
+        const response = await axios.get(`${backendUrl}/api/posts/users/${user.uid}/posts`);
         const postsWithAddresses = await Promise.all(
           response.data.map(async (post) => {
             const address = await getAddressFromCoordinates(post.location.lat, post.location.lon);

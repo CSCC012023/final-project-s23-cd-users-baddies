@@ -24,6 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { FaMagic } from 'react-icons/fa';
 import TextareaAutosize from 'react-textarea-autosize';
+import { backendUrl } from '../../config';
 
 // import logo from "../Home/assets/img/bizreach-logo.png";
 
@@ -94,7 +95,7 @@ const Post = () => {
 
           
           // Make a POST request to the backend API
-          const res = await fetch(`http://localhost:3000/api/posts/users/${user.uid}/posts`, {
+          const res = await fetch(`${backendUrl}/api/posts/users/${user.uid}/posts`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

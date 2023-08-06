@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardBody, Heading, Text, Stack, Flex } from "@chakra-ui/react";
 import RatingStars from "./Rating";
+import { backendUrl } from "../../../config";
 
 function ReviewCard({ review }) {
     const [customer, setCustomer] = useState('');
@@ -12,7 +13,7 @@ function ReviewCard({ review }) {
       const fetchCustomerName = async () => {
         try {
             const customerId = review.customerAccount._path.segments[1];
-            const customerDoc = await axios.get(`http://localhost:3000/api/users/profile/${customerId}`);
+            const customerDoc = await axios.get(`${backendUrl}/api/users/profile/${customerId}`);
             setCustomer(customerDoc.data.Name);
         } catch (error) {
           console.error('Error fetching customer data:', error);

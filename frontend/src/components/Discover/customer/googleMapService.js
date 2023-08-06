@@ -1,10 +1,11 @@
 import ioClient from 'socket.io-client';
+import { backendUrl } from '../../../config';
 
-const socket = ioClient('http://localhost:3000');
+const socket = ioClient(backendUrl);
 
 const fetchPosts = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/posts');
+    const response = await fetch(`${backendUrl}/api/posts`);
     const posts = await response.json();
     return posts;
   } catch (error) {
@@ -15,7 +16,7 @@ const fetchPosts = async () => {
 
 const applyForGig = async (selectedPost, userId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/gigs/users/${userId}/gigs`, {
+      const response = await fetch(`${backendUrl}/api/gigs/users/${userId}/gigs`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,7 +56,7 @@ const createNotification = async (receiverId, senderId, text, type, gid, pid) =>
     console.log('pId:', pid);
   
     try {
-      const response = await fetch('http://localhost:3000/api/notifications/create', {
+      const response = await fetch(`${backendUrl}/api/notifications/create`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ const createNotification = async (receiverId, senderId, text, type, gid, pid) =>
   
   const checkIfPostIsRequestedByUser = async (selectedPost, userId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/gigs/users/${userId}/checkIfPostRequested/${selectedPost.pid}`);
+      const response = await fetch(`${backendUrl}/api/gigs/users/${userId}/checkIfPostRequested/${selectedPost.pid}`);
       if (!response.ok) {
         throw new Error('Failed to check if post is requested by user');
       }

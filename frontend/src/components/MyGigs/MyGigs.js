@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import axios from 'axios';
 import { getFirestore, collection, doc, getDoc } from "firebase/firestore";
+import { backendUrl } from '../../config';
 
 const db = getFirestore(); // Assume Firebase is already initialized
 
@@ -28,7 +29,7 @@ const MyGigs = () => {
   useEffect(() => {
     const fetchUserGigs = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/gigs/users/${user.uid}/gigs`);
+        const response = await axios.get(`${backendUrl}/api/gigs/users/${user.uid}/gigs`);
         const gigsData = await Promise.all(
           response.data.map(async (gig) => {
             const postRef = doc(db, gig.post._path.segments[0], gig.post._path.segments[1]);

@@ -3,6 +3,7 @@ import axios from "axios";
 import ReviewCard from "./ReviewCard";
 import { UserContext } from "../../User/UserContext";
 import { useState, useContext, useEffect } from 'react';
+import { backendUrl } from "../../../config";
 
 
 function ReviewsTab() {
@@ -15,7 +16,7 @@ function ReviewsTab() {
   
     const fetchReviews = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/reviews/${user.uid}`);
+        const response = await axios.get(`${backendUrl}/api/reviews/${user.uid}`);
         setReviews(response.data.reviews);
       } catch (error) {
         console.error('Error fetching reviews:', error);

@@ -5,6 +5,7 @@ import { IoMdNotifications } from 'react-icons/io';
 import NotificationItem from './NotificationItem';
 import GigRequestNotificationItem from './GigRequestNotificationItem';
 import { FaBell } from "react-icons/fa";
+import { backendUrl } from '../../config';
 
 const Notifications = () => {
   const user = useContext(UserContext);
@@ -17,7 +18,7 @@ const Notifications = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/notifications/${user.uid}`);
+      const response = await fetch(`${backendUrl}/api/notifications/${user.uid}`);
       if (response.ok) {
         const notificationsData = await response.json();
         console.log('Notifications data:', notificationsData);
@@ -42,7 +43,7 @@ const Notifications = () => {
 
   const handleSendMessage = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/${user.uid}/${selectedNotification.sender.uid}`, {
+      const response = await fetch(`${backendUrl}/api/messages/${user.uid}/${selectedNotification.sender.uid}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +79,7 @@ const Notifications = () => {
       
       // Update the status of the gig to "in-progress"
       console.log(notification.gig.gid)
-      const responseGigUpdate = await fetch(`http://localhost:3000/api/gigs/${notification.gig.gid}`, {
+      const responseGigUpdate = await fetch(`${backendUrl}/api/gigs/${notification.gig.gid}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +95,7 @@ const Notifications = () => {
       }
   
       // Call the API to update the post status to "in-progress"
-      const responsePostUpdate = await fetch(`http://localhost:3000/api/posts/${notification.post.pid}`, {
+      const responsePostUpdate = await fetch(`${backendUrl}/api/posts/${notification.post.pid}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +113,7 @@ const Notifications = () => {
       }
   
       // Call the API to update the customer's notification
-      const responseUpdate = await fetch(`http://localhost:3000/api/notifications/${user.uid}/${notification.timestamp}`, {
+      const responseUpdate = await fetch(`${backendUrl}/api/notifications/${user.uid}/${notification.timestamp}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -141,7 +142,7 @@ const Notifications = () => {
         }));
   
         // Create a new notification for the business
-        const responseCreate = await fetch('http://localhost:3000/api/notifications/create', {
+        const responseCreate = await fetch(`${backendUrl}/api/notifications/create`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -173,7 +174,7 @@ const Notifications = () => {
       console.log('Decline notification:', notification); 
 
       // Call the API to delete the gig
-      const responseGigDelete = await fetch(`http://localhost:3000/api/gigs/${notification.gig.gid}/${notification.sender.uid}`, {
+      const responseGigDelete = await fetch(`${backendUrl}/api/gigs/${notification.gig.gid}/${notification.sender.uid}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -186,7 +187,7 @@ const Notifications = () => {
       }
       
       // Call the API to update the customer's notification
-      const responseUpdate = await fetch(`http://localhost:3000/api/notifications/${user.uid}/${notification.timestamp}`, {
+      const responseUpdate = await fetch(`${backendUrl}/api/notifications/${user.uid}/${notification.timestamp}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -215,7 +216,7 @@ const Notifications = () => {
         }));
 
         // Create a new notification for the business
-        const responseCreate = await fetch('http://localhost:3000/api/notifications/create', {
+        const responseCreate = await fetch(`${backendUrl}/api/notifications/create`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
