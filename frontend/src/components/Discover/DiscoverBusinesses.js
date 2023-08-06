@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import bisimg from './businessimg.jpeg';
+import { backendUrl } from '../../config';
 
 const DiscoverBusinesses = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -31,7 +32,7 @@ const DiscoverBusinesses = () => {
     // Fetch businesses data from the server
     const fetchBusinesses = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/api/users/businesses/');
+        const response = await axios.get(`${backendUrl}/api/users/businesses/`);
         setBusinesses(response.data);
       } catch (error) {
         console.error('Error fetching businesses:', error);
@@ -48,7 +49,7 @@ const DiscoverBusinesses = () => {
 
   const handleViewServices = async () => {
     try {
-      const response = await axios.get(`http://localhost:3000/api/users/services/${selectedBusiness.uid}`);
+      const response = await axios.get(`${backendUrl}/api/users/services/${selectedBusiness.uid}`);
       setServices(response.data);
     } catch (error) {
       console.error('Error fetching services:', error);

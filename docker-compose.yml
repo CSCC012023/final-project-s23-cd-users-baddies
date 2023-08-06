@@ -1,0 +1,14 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: ./backend
+    image: anaskhan0607/final-project-s23-cd-users-baddies-backend:latest
+    ports:
+      - "3000:3000"
+  frontend:
+    build:
+      context: ./frontend
+    image: anaskhan0607/final-project-s23-cd-users-baddies-frontend:latest
+    ports:
+      - "3001:3001"

@@ -1,0 +1,69 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - Deployment
+
+jobs:
+  docker-build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: anaskhan0607 
+          password: helloworld
+
+      - name: Build and push frontend image
+        run: docker build -t anaskhan0607/final-project-s23-cd-users-baddies-frontend:latest ./frontend
+        working-directory: ./
+
+      - name: Push frontend image to Docker Hub
+        run: docker push anaskhan0607/final-project-s23-cd-users-baddies-frontend:latest
+        working-directory: ./
+
+      - name: Build and push backend image
+        run: docker build -t anaskhan0607/final-project-s23-cd-users-baddies-backend:latest ./backend
+        working-directory: ./
+
+      - name: Push backend image to Docker Hub
+        run: docker push anaskhan0607/final-project-s23-cd-users-baddies-backend:latest
+        working-directory: ./
+
+      - name: Run Tests
+        run: npm test
+        working-directory: ./backend
+
+      - name: Setup gcloud CLI
+        uses: google-github-actions/setup-gcloud@v0.2.1
+        with:
+          project_id: cd-user-baddies
+          export_default_credentials: true
+
+      - name: Authenticate to GKE cluster
+        run: |
+          gcloud auth activate-service-account --key-file=GKE/GKE_SA_KEY.json
+          gcloud container clusters get-credentials aneeq-anas-harshil --zone northamerica-northeast2-a --project cd-user-baddies
+
+      - name: Apply Kubernetes resources
+        run: |
+          kubectl apply -f ./frontend/kubernetes/frontend-deployment.yml
+          kubectl apply -f ./frontend/kubernetes/frontend-ingress.yml
+          kubectl apply -f ./frontend/kubernetes/frontend-service.yml
+          kubectl apply -f ./backend/kubernetes/backend-deployment.yml
+          kubectl apply -f ./backend/kubernetes/backend-service.yml
+
+      - name: Rollout restart deployments
+        run: |
+          kubectl rollout restart deployment/kubernetes/frontend-deployment
+          kubectl rollout restart deployment/kubernetes/backend-deployment

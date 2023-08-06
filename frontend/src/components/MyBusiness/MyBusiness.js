@@ -37,6 +37,7 @@ import axios from 'axios';
 import ServiceCard from './Services/ServiceCard';
 import ClientCard from './Clients/Clients';
 import Schedule from './Schedule/Schedule';
+import { backendUrl } from '../../config';
 
 
 const MyBusiness = () => {
@@ -144,7 +145,7 @@ const MyBusiness = () => {
 
     const fetchUserClients = async () => {
       try {
-        const response = await axios.get(`http://localhost:3000/api/users/clients/${user.uid}`);
+        const response = await axios.get(`${backendUrl}/api/users/clients/${user.uid}`);
         setClients(response.data);
       } catch (error) {
         console.error('Error fetching clients:', error);

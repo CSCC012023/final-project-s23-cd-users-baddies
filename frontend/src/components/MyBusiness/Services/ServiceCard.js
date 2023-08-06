@@ -25,6 +25,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { UserContext } from '../../User/UserContext';
+import { backendUrl } from '../../../config';
 
 function ServiceCard({ serviceId,name, description, price, duration, servicePic, onDeleteService }) {
   const [editedService, setEditedService] = useState({
@@ -51,7 +52,7 @@ function ServiceCard({ serviceId,name, description, price, duration, servicePic,
     try {
 
       const response = await axios.delete(
-        `http://localhost:3000/api/users/services/${user.uid}/${serviceId}`
+        `${backendUrl}/api/users/services/${user.uid}/${serviceId}`
       );
 
       console.log(response.data);
@@ -96,7 +97,7 @@ function ServiceCard({ serviceId,name, description, price, duration, servicePic,
       // Make the PUT request to update the service
       // console.log(user)
       const response = await axios.put(
-        `http://localhost:3000/api/users/services/${user.uid}/${serviceId}`,
+        `${backendUrl}/api/users/services/${user.uid}/${serviceId}`,
         updatedServiceData
       );
 
