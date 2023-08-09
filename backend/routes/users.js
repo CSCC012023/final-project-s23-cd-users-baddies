@@ -66,6 +66,7 @@ router.post('/services/:userId', async (req, res) => {
       duration,
       servicePic
     };
+    console.log(servicePic)
 
     await addBusinessUserService(userId, newService);
 
