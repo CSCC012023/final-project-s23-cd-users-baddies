@@ -51,24 +51,27 @@ function ClientCard({ name }) {
     };
 
     const formatTimestamp = (timestamp) => {
+        if (!timestamp) {
+          return "No timestamp available";
+        }
+      
         const date = new Date(timestamp);
         if (isNaN(date.getTime())) {
-            console.error("Invalid timestamp:", timestamp);
-            return "";
+          console.error("Invalid timestamp:", timestamp);
+          return "Invalid timestamp";
         } else {
-            const options = {
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric', 
-                hour: 'numeric',
-                minute: 'numeric',
-                timeZoneName: 'short',
-                timeZone: 'America/New_York' // set timezone to Eastern Time
-            };
-            return date.toLocaleString('en-US', options);
+          const options = {
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric', 
+            hour: 'numeric',
+            minute: 'numeric',
+            timeZoneName: 'short',
+            timeZone: 'America/New_York' // set timezone to Eastern Time
+          };
+          return date.toLocaleString('en-US', options);
         }
-    };
-    
+      };
     
     
 
