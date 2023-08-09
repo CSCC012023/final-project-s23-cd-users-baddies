@@ -208,7 +208,7 @@ const Login = () => {
       const storageRef = ref(storage, `avatars/${auth.currentUser.uid}`);
       const snapshot = await uploadBytes(storageRef, avatarImage);
       const downloadURL = await getDownloadURL(snapshot.ref);
-      userData.profilePicture = downloadURL; // Add the downloadURL to userData
+      userData.profilePicture = avatarImage; // Add the downloadURL to userData
     } catch (error) {
       console.error('Error uploading image:', error);
     }
